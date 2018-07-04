@@ -1,0 +1,8 @@
+number	OP	function	src1		src2		result		zcv
+1		d	NAND		11111111	11111111	eeeeeeee	0
+2		0	AND			ffff0000	0000ffff	00000000	4
+3		1	OR			3113c398	088e4954	399fcbdc	0
+4		2	ADDU		ffffffff	00000001	00000000	7
+5		6	SUBU		7eda5023	2ec36ae5	5016e53e	2
+6		7	SLTU		00000001	ffffffff	00000001	1
+7		C	NOR			00000000	00000000	ffffffff	0

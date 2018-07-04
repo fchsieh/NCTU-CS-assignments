@@ -1,0 +1,7 @@
+# NCTU OS 2018(Spring)
+Not 100% correct, for reference only :)
+### HW1: [A Simple Shell](https://github.com/scdsr/NCTU_OS_2018S/tree/master/HW1)
+### HW2: [Multi-Process Matrix Multiplication using Shared Memory](https://github.com/scdsr/NCTU_OS_2018S/tree/master/HW2)
+### HW3: [Parallel Quicksort using Pthread](https://github.com/scdsr/NCTU_OS_2018S/tree/master/HW3)
+### HW4: [Quicksort with a Thread Pool](https://github.com/scdsr/NCTU_OS_2018S/tree/master/HW4)
+### HW5: [Page Replacement Simulation: FIFO and LRU](https://github.com/scdsr/NCTU_OS_2018S/tree/master/HW5)
