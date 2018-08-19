@@ -7,4 +7,4 @@ I choose BKDRHash as my main hash function
 
 ### Performance
 
-![performance](https://github.com/scdsr/NCTU_DS-OOP_2018S/blob/master/Hash_Table/runtime.jpg)
+![performance](https://github.com/scdsr/NCTU-CS-assignments/blob/master/DSOOP_2018_Spring/Hash_Table/runtime.jpg)
