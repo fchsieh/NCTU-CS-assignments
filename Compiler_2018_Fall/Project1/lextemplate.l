@@ -11,7 +11,11 @@ int linenum = 1;
 char buf[MAX_LINE_LENGTH];
 %}
 
+%x COMMENT
+
 %%
+"//" { BEGIN COMMENT; }
+
 "(" {
     tokenString("delim", "("); 
 }
@@ -27,6 +31,11 @@ char buf[MAX_LINE_LENGTH];
 . { // Unrecognized character
     fprintf(stderr, "Error at line %d: %s\n", linenum, yytext);
     exit(1);
+}
+
+
+<COMMENT>. {
+    /* do nothing */
 }
 
 %%
