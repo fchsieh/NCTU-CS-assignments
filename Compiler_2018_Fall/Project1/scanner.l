@@ -12,14 +12,49 @@ int linenum = 1;
 char buf[MAX_LINE_LENGTH];
 %}
 
+digit [0-9]
+
+identifier [a-zA-Z_][a-zA-Z_0-9]*
+
+ws [ \t\r\s]+
+
 %%
 
-"//" {
-        
+{ws} { 
+    yymore();
+}
+
+"//".*\n {
+    printf("%d:%s\n", linenum, yytext);
+    linenum++;
+}
+
+"void" {
+    tokenString("KW", "void");
+}
+
+"main" {
+    tokenString("id", "main");
+}
+
+"{" {
+    tokenString("delim", "{");
 }
 
 "(" {
     tokenString("delim", "("); 
+}
+
+")" {
+    tokenString("delim", ")");
+}
+
+"int" {
+    tokenString("KW", "int");
+}
+
+{identifier} {
+    tokenString("id", yytext);
 }
 
 \n {
