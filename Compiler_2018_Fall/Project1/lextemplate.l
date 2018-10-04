@@ -1,4 +1,5 @@
 %{
+#include <string.h>
 #define LIST                { strncat(buf, yytext, sizeof(buf) - strlen(buf) - 1); }
 #define token(t)            { LIST; if (Opt_Token) printf("<%s>\n", #t); }
 #define tokenString(t, s)   { LIST; if (Opt_Token) printf("<%s:%s>\n", t, s); }
@@ -11,10 +12,11 @@ int linenum = 1;
 char buf[MAX_LINE_LENGTH];
 %}
 
-%x COMMENT
-
 %%
-"//" { BEGIN COMMENT; }
+
+"//" {
+        
+}
 
 "(" {
     tokenString("delim", "("); 
@@ -33,10 +35,6 @@ char buf[MAX_LINE_LENGTH];
     exit(1);
 }
 
-
-<COMMENT>. {
-    /* do nothing */
-}
 
 %%
 
@@ -60,6 +58,8 @@ int main( int argc, char **argv )
     if (Opt_Statistic)
     {
         // Print frequency table
+        printf("frequencies of identifiers:\n");
+        
     }
 
     exit(0);
