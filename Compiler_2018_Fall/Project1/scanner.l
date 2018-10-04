@@ -12,6 +12,8 @@ int linenum = 1;
 char buf[MAX_LINE_LENGTH];
 %}
 
+keyword while|do|if|else|true|false|for|int|print|const|read|boolean|bool|void|float|double|string|continue|break|return
+
 digit [0-9]
 
 identifier [a-zA-Z_][a-zA-Z_0-9]*
@@ -24,18 +26,15 @@ ws [ \t\r\s]+
     yymore();
 }
 
+{identifier} {
+    tokenString("id", yytext);
+}
+
 "//".*\n {
     printf("%d:%s\n", linenum, yytext);
     linenum++;
 }
 
-"void" {
-    tokenString("KW", "void");
-}
-
-"main" {
-    tokenString("id", "main");
-}
 
 "{" {
     tokenString("delim", "{");
@@ -47,14 +46,6 @@ ws [ \t\r\s]+
 
 ")" {
     tokenString("delim", ")");
-}
-
-"int" {
-    tokenString("KW", "int");
-}
-
-{identifier} {
-    tokenString("id", yytext);
 }
 
 \n {
