@@ -1,7 +1,7 @@
 %{
 #include <string.h>
 #define LIST                { strncat(buf, yytext, sizeof(buf) - strlen(buf) - 1); }
-#define token(t)            { LIST; if (Opt_Token) printf("<%s>\n", #t); }
+#define token(t)            { LIST; if (Opt_Token) printf("<\"%s\">\n", #t); }
 #define tokenString(t, s)   { LIST; if (Opt_Token) printf("<%s:%s>\n", t, s); }
 #define MAX_LINE_LENGTH 257
 #define MAX_ID_LENGTH 257
@@ -12,40 +12,56 @@ int linenum = 1;
 char buf[MAX_LINE_LENGTH];
 %}
 
-keyword while|do|if|else|true|false|for|int|print|const|read|boolean|bool|void|float|double|string|continue|break|return
+delimiter (\,|\;|\(|\)|\[|\]|\{|\})
 
-digit [0-9]
+operator (\+|\-|\*|\/|\%|\=|\<|"<="|"!="|">="|">"|"=="|"&&"|"||"|"!")
 
-identifier [a-zA-Z_][a-zA-Z_0-9]*
+keyword (while|do|if|else|true|false|for|int|print|const|read|boolean|bool|void|float|double|string|continue|break|return)
 
-ws [ \t\r\s]+
+float ({integer}.{integer})
+
+integer (0|[1-9][0-9]*)
+
+identifier ([a-zA-Z_][a-zA-Z_0-9]*)
+
+ws [ \t\s]+
 
 %%
-
-{ws} { 
+{ws} {
     yymore();
+}
+
+{keyword} {
+    tokenString("KW", yytext);
+}
+
+{operator} {
+    token(yytext);
+}
+
+{delimiter} {
+    tokenString("delim", yytext);
 }
 
 {identifier} {
     tokenString("id", yytext);
 }
 
+{float} {
+    tokenString("float", yytext);
+}
+
+{integer} {
+    tokenString("integer", yytext);
+}
+
+\".*\" {
+    tokenString("string", yytext);
+}
+
 "//".*\n {
     printf("%d:%s\n", linenum, yytext);
     linenum++;
-}
-
-
-"{" {
-    tokenString("delim", "{");
-}
-
-"(" {
-    tokenString("delim", "("); 
-}
-
-")" {
-    tokenString("delim", ")");
 }
 
 \n {
