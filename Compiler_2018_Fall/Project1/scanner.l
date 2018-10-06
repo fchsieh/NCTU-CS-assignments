@@ -12,57 +12,55 @@ int linenum = 1;
 char buf[MAX_LINE_LENGTH];
 %}
 
-delimiter (\,|\;|\(|\)|\[|\]|\{|\})
+digit       [0-9]
+nzero       [1-9]
+character   [a-zA-Z]
+delimiter   [\,\;\(\)\[\]\{\}]
+mathop      [\+\-\*\/\%]
+relational  []
+logical     []
+identifier  [_a-zA-Z][_a-zA-Z0-9]
 
-operator (\+|\-|\*|\/|\%|\=|\<|"<="|"!="|">="|">"|"=="|"&&"|"||"|"!")
-
-keyword (while|do|if|else|true|false|for|int|print|const|read|boolean|bool|void|float|double|string|continue|break|return)
-
-float ({integer}.{integer})
-
-integer (0|[1-9][0-9]*)
-
-identifier ([a-zA-Z_][a-zA-Z_0-9]*)
-
-ws [ \t\s]+
+%Start IN_COMMENT STRING
 
 %%
-{ws} {
-    yymore();
+    /* ===== Comment ===== */
+<INITIAL>"//".*\n { // Cpp-style comment
+    LIST;
+    if (Opt_Source)
+        printf("%d:%s\n", linenum, buf);
+    ++linenum;
+    buf[0] = '\0';
 }
 
-{keyword} {
-    tokenString("KW", yytext);
+<INITIAL>"/*" { // start of C-style comment
+    LIST;
+    BEGIN IN_COMMENT;
 }
 
-{operator} {
-    token(yytext);
+<IN_COMMENT>"*/" { // end of C-style comment
+    LIST;
+    BEGIN INITIAL;
 }
+<IN_COMMENT>. {
+    LIST;
+}
+    /* END OF COMMENT SECTION */
 
-{delimiter} {
-    tokenString("delim", yytext);
+    /* ===== String ===== */
+<INITIAL>"\"" { // start of string
+    LIST;
+    BEGIN STRING;
 }
+<STRING>"\"" {  // end of string
+    tokenString("string", buf);
+    buf[0] = '\0';
+    BEGIN INITIAL;
+}
+    /* END OF STRING SECTION */
 
-{identifier} {
-    tokenString("id", yytext);
-}
+    /* ===== Identifier ===== */
 
-{float} {
-    tokenString("float", yytext);
-}
-
-{integer} {
-    tokenString("integer", yytext);
-}
-
-\".*\" {
-    tokenString("string", yytext);
-}
-
-"//".*\n {
-    printf("%d:%s\n", linenum, yytext);
-    linenum++;
-}
 
 \n {
     LIST;
