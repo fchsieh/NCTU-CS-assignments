@@ -1,10 +1,12 @@
-// print hello world * // * *** */ \n do { int a = b;} while (a > 2) 
-// test 2
-/* // test3 // */
-/* 
- * test 1
-// * test2 /* do_hello_world */
- * test 3
-*/
-// this is a comment // line */ /* with some /* delimiters */ before the end
-
+// print hello world
+void main()
+{
+int a;
+double b;
+print "hello world";
+a = 1+1;
+b = 1.23;
+if (a > 1){
+b = b*1.23e-1;
+}
+}
