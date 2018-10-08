@@ -1,0 +1,9 @@
+// pattern name: pragma_error3
+#pragma statistic off//comment OK
+#pragma statistic on/* comment OK */
+
+#pragma statistic off/* comment 
+OK */
+#pragma source off/*after comment*/ int a;
+
+#pragma source on int a;

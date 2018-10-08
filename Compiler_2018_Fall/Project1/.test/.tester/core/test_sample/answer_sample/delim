@@ -1,0 +1,42 @@
+1:// pattern name: delim
+
+2:#pragma statistic off
+
+<delim:,>
+3:,
+
+<delim:;>
+4:;
+
+5:
+
+6:
+
+<delim:(>
+7:(
+
+<delim:)>
+8: )
+
+<delim:[>
+9:	 [
+
+<delim:]>
+10:		]
+
+<delim:{>
+11: {
+
+<delim:}>
+12: }
+
+<delim:,>
+<delim:;>
+<delim:[>
+<delim:]>
+<delim:(>
+<delim:)>
+<delim:{>
+<delim:}>
+13:,;[](){}
+

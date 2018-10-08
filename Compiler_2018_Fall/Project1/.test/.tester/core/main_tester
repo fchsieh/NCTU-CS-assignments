@@ -1,0 +1,34 @@
+#!/bin/sh
+
+function run_test(){
+    dir=$1
+    shift
+    for type in $@
+    do 
+        echo "Running test for $type" 
+        ./scanner ./${dir}/$type > ${dir}-${type}.result 
+        diff ./${dir}/answer_sample/$type ${dir}-${type}.result 
+        if [ $? -eq 0 ] ; then 
+            echo "***Pass***" 
+        fi 
+        rm -f $dir-$type.result 
+    done
+}
+
+
+echo "--------------------------------------------------"
+echo "=====Running test for standard test sample...====="
+echo "--------------------------------------------------"
+std='comment delim error2 float float_error2 general_1 identifier integer keyword op pragma_errorcase pragma_errorcase2 scientific scientific_error string string_error' 
+run_test "test_sample" ${std}
+echo "----------end of standard test----------"
+#echo 
+#echo "--------------------------------------------------"
+#echo "=====Running test for extra test sample...====="
+#echo "--------------------------------------------------"
+#extra='pragma_errorcase3'
+#run_test "extra_test" ${extra}
+#echo "----------end of extra test----------"
+
+
+

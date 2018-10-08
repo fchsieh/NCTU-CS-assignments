@@ -1,0 +1,20 @@
+// pattern name: op
+#pragma statistic off
++
+
+
+-
+	  	*
+/
+mod
+
+   =
+< >
+<=
+!=
+! =
+>=
+=
+
++-*/mod=<<=<>>>==!=
+

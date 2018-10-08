@@ -1,0 +1,29 @@
+// pattern name: scientific
+
+369E2
+
+125e2
+
+123E+4
+
+135E-6
+
+147E0
+
+147e-1
+
+1.23E2
+
+2.345E-1
+
+25.01E2
+
+123E01		// scientific: 123E01 ;
+123e000		// scientific:1 23e000
+00.1E5		// scientific: 00.1E5
+
+768e5e3		// scientific: 768e5 ; id: e3
+123e+abC	// int: 123 ; id: e ; op: + ; id: abC
+00.0E00
+00.1E00
+00.0E01

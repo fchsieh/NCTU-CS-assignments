@@ -1,0 +1,40 @@
+1:// pattern name: identifier
+
+2:#pragma statistic off
+
+<integer:0>
+<id:aa>
+3:0aa
+
+<id:aa0>
+4:aa0
+
+5:
+
+<id:integerA>
+6:	integerA
+
+<id:integera>
+7: integera
+
+8:
+
+<id:floatbegin>
+9:floatbegin
+
+10:
+
+<id:whiledo>
+<KW:if>
+11:whiledo if
+
+12:
+
+<id:intege>
+<id:r>
+13:intege r
+
+<id:sdfsd>
+<id:a>
+14:sdfsd a
+

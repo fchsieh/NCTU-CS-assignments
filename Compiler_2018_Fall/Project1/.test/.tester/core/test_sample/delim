@@ -1,0 +1,13 @@
+// pattern name: delim
+#pragma statistic off
+,
+;
+
+
+(
+ )
+	 [
+		]
+ {
+ }
+,;[](){}

@@ -1,0 +1,395 @@
+Starting test for file:scanner.l ...
+make: Entering directory `/net/cs/105/0513328/NCTU-cs-assignments/Compiler_2018_Fall/Project1/NCTU-Compiler-Hw1-Tester/core'
+--------------------------------------------------
+=====Running test for standard test sample...=====
+--------------------------------------------------
+Running test for comment
+3c3
+< 2:#pragma statistic off
+---
+>  off
+5c5
+< 3:
+---
+> /* this is a C-style comment */
+7c7
+< 4:/* this is a C-style comment */
+---
+> // this is a C++-style comment
+9c9,10
+< 5:
+---
+> //* this is a C++-style comment */ int iDent1;
+> while
+11c12,13
+< 6:// this is a C++-style comment
+---
+> //* this is a C++-style comment   int iDent2;
+> int iDent3; */
+13c15
+< 7:
+---
+> /* this is a // C-style comment */int iDent4;
+15c17,24
+< 8://* this is a C++-style comment */ int iDent1;
+---
+> /*   this is a multiple line C-style comment
+>       hi \n   
+> 	\n
+> \t   1234
+>    for   {  } do break;
+>    #pragma source off
+>    123E-1
+> */
+17,60c26
+< <KW:while>
+< 9:while
+< 
+< 10:
+< 
+< 11://* this is a C++-style comment   int iDent2;
+< 
+< <KW:int>
+< <id:iDent3>
+< <delim:;>
+< <"*">
+< <"/">
+< 12:int iDent3; */
+< 
+< 13:
+< 
+< <KW:int>
+< <id:iDent4>
+< <delim:;>
+< 14:/* this is a // C-style comment */int iDent4;
+< 
+< 15:
+< 
+< 16:/*   this is a multiple line C-style comment
+< 
+< 17:      hi \n   
+< 
+< 18:	\n
+< 
+< 19:\t   1234
+< 
+< 20:   for   {  } do break;
+< 
+< 21:   #pragma source off
+< 
+< 22:   123E-1
+< 
+< 23:*/
+< 
+< 24:
+< 
+< 25:// this is a C++ style comment   real r;   1/2+3
+< 
+< 26:
+---
+> // this is a C++ style comment   real r;   1/2+3
+61a28
+> frequencies of identifiers:
+Running test for delim
+3c3,5
+< 2:#pragma statistic off
+---
+>  off
+> ,
+> ;
+5,41d6
+< <delim:,>
+< 3:,
+< 
+< <delim:;>
+< 4:;
+< 
+< 5:
+< 
+< 6:
+< 
+< <delim:(>
+< 7:(
+< 
+< <delim:)>
+< 8: )
+< 
+< <delim:[>
+< 9:	 [
+< 
+< <delim:]>
+< 10:		]
+< 
+< <delim:{>
+< 11: {
+< 
+< <delim:}>
+< 12: }
+< 
+< <delim:,>
+< <delim:;>
+< <delim:[>
+< <delim:]>
+< <delim:(>
+< <delim:)>
+< <delim:{>
+< <delim:}>
+< 13:,;[](){}
+42a8,15
+> (
+>  )
+> 	 [
+> 		]
+>  {
+>  }
+> ,;[](){}
+> frequencies of identifiers:
+Running test for error2
+***Pass***
+Running test for float
+31c31,32
+< <float:00.123>
+---
+> <integer:0>
+> <float:0.123>
+36c37,40
+< <float:123.0000>
+---
+> <float:123.0>
+> <integer:0>
+> <integer:0>
+> <integer:0>
+41c45,49
+< <float:123.00001>
+---
+> <float:123.0>
+> <integer:0>
+> <integer:0>
+> <integer:0>
+> <integer:1>
+Running test for float_error2
+***Pass***
+Running test for general_1
+69,71d68
+< main	1
+< a	3
+< b	4
+Running test for identifier
+3c3,5
+< 2:#pragma statistic off
+---
+>  off
+> 0aa
+> aa0
+5,7c7,8
+< <integer:0>
+< <id:aa>
+< 3:0aa
+---
+> 	integerA
+>  integera
+9,10c10
+< <id:aa0>
+< 4:aa0
+---
+> floatbegin
+12,39c12
+< 5:
+< 
+< <id:integerA>
+< 6:	integerA
+< 
+< <id:integera>
+< 7: integera
+< 
+< 8:
+< 
+< <id:floatbegin>
+< 9:floatbegin
+< 
+< 10:
+< 
+< <id:whiledo>
+< <KW:if>
+< 11:whiledo if
+< 
+< 12:
+< 
+< <id:intege>
+< <id:r>
+< 13:intege r
+< 
+< <id:sdfsd>
+< <id:a>
+< 14:sdfsd a
+---
+> whiledo if
+40a14,16
+> intege r
+> sdfsd a
+> frequencies of identifiers:
+Running test for integer
+***Pass***
+Running test for keyword
+3,41c3,12
+< 2:#pragma statistic off
+< 
+< <KW:do>
+< 3:do
+< 
+< <KW:boolean>
+< <KW:double>
+< 4:boolean double
+< 
+< <KW:else>
+< <KW:float>
+< 5:else float 
+< 
+< <KW:false>
+< <KW:for>
+< <KW:int>
+< 6:false for int
+< 
+< <KW:if>
+< <KW:void>
+< 7:if void
+< 
+< <KW:print>
+< <KW:read>
+< <KW:string>
+< 8:print read string 
+< 
+< <KW:true>
+< 9:true
+< 
+< <KW:return>
+< <KW:break>
+< <KW:continue>
+< 10:return break continue
+< 
+< <KW:while>
+< 11:while
+< 
+< 12:
+---
+>  off
+> do
+> boolean double
+> else float 
+> false for int
+> if void
+> print read string 
+> true
+> return break continue
+> while
+42a14
+> frequencies of identifiers:
+Running test for op
+3c3,4
+< 2:#pragma statistic off
+---
+>  off
+> +
+5,6d5
+< <"+">
+< 3:+
+8c7,18
+< 4:
+---
+> -
+> 	  	*
+> /
+> mod
+> 
+>    =
+> < >
+> <=
+> !=
+> ! =
+> >=
+> =
+10,67c20
+< 5:
+< 
+< <"-">
+< 6:-
+< 
+< <"*">
+< 7:	  	*
+< 
+< <"/">
+< 8:/
+< 
+< <id:mod>
+< 9:mod
+< 
+< 10:
+< 
+< <"=">
+< 11:   =
+< 
+< <"<">
+< <">">
+< 12:< >
+< 
+< <"<=">
+< 13:<=
+< 
+< <"!=">
+< 14:!=
+< 
+< <"!">
+< <"=">
+< 15:! =
+< 
+< <">=">
+< 16:>=
+< 
+< <"=">
+< 17:=
+< 
+< 18:
+< 
+< <"+">
+< <"-">
+< <"*">
+< <"/">
+< <id:mod>
+< <"=">
+< <"<">
+< <"<=">
+< <"<">
+< <">">
+< <">">
+< <">=">
+< <"=">
+< <"!=">
+< 19:+-*/mod=<<=<>>>==!=
+< 
+< 20:
+---
+> +-*/mod=<<=<>>>==!=
+68a22
+> frequencies of identifiers:
+Running test for pragma_errorcase
+***Pass***
+Running test for pragma_errorcase2
+***Pass***
+Running test for scientific
+45c45,46
+< <scientific:25.01E2>
+---
+> <float:25.0>
+> <scientific:1E2>
+81,83d81
+< e3	1
+< e	1
+< abC	1
+Running test for scientific_error
+***Pass***
+Running test for string
+***Pass***
+Running test for string_error
+***Pass***
+----------end of standard test----------
+make: Leaving directory `/net/cs/105/0513328/NCTU-cs-assignments/Compiler_2018_Fall/Project1/NCTU-Compiler-Hw1-Tester/core'

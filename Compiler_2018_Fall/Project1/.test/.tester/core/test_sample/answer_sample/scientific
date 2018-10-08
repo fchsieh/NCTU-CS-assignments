@@ -1,0 +1,83 @@
+1:// pattern name: scientific
+
+2:
+
+<scientific:369E2>
+3:369E2
+
+4:
+
+<scientific:125e2>
+5:125e2
+
+6:
+
+<scientific:123E+4>
+7:123E+4
+
+8:
+
+<scientific:135E-6>
+9:135E-6
+
+10:
+
+<scientific:147E0>
+11:147E0
+
+12:
+
+<scientific:147e-1>
+13:147e-1
+
+14:
+
+<scientific:1.23E2>
+15:1.23E2
+
+16:
+
+<scientific:2.345E-1>
+17:2.345E-1
+
+18:
+
+<scientific:25.01E2>
+19:25.01E2
+
+20:
+
+<scientific:123E01>
+21:123E01		// scientific: 123E01 ;
+
+<scientific:123e000>
+22:123e000		// scientific:1 23e000
+
+<scientific:00.1E5>
+23:00.1E5		// scientific: 00.1E5
+
+24:
+
+<scientific:768e5>
+<id:e3>
+25:768e5e3		// scientific: 768e5 ; id: e3
+
+<integer:123>
+<id:e>
+<"+">
+<id:abC>
+26:123e+abC	// int: 123 ; id: e ; op: + ; id: abC
+
+<scientific:00.0E00>
+27:00.0E00
+
+<scientific:00.1E00>
+28:00.1E00
+
+<scientific:00.0E01>
+29:00.0E01
+
+frequencies of identifiers:
+e3	1
+e	1
+abC	1
