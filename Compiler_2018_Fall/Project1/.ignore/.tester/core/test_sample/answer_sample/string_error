@@ -1,9 +1,0 @@
-1:// pattern name: string_error
-
-2:
-
-3:// embedded newline error
-
-<string: =>
-Error at line 4: 
-

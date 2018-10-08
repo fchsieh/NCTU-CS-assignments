@@ -1,5 +1,0 @@
-// pattern name: scientific_error
-
-// error case
-123E1.23	// 123E1: scientific ; .:error
-

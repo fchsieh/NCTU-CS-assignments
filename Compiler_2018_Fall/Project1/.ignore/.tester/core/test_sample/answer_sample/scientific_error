@@ -1,8 +1,0 @@
-1:// pattern name: scientific_error
-
-2:
-
-3:// error case
-
-<scientific:123E1>
-Error at line 4: .
