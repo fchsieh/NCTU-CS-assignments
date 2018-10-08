@@ -31,7 +31,7 @@ char        [a-zA-Z]
 digit       [0-9]
 nzero       [1-9]
 integer     0|{nzero}{digit}*
-float       ({integer})[.]({integer})
+float       [0-9]+\.[0-9]+
 identifier  [_a-zA-Z][_a-zA-Z0-9]*
 scNotation  0*({float}|{integer})[Ee][\+\-]?0*{integer}
 
@@ -43,8 +43,8 @@ scNotation  0*({float}|{integer})[Ee][\+\-]?0*{integer}
 %x PRAGMA_SOURCE
 %x PRAGMA_STATISTIC
 %x PRAGMA_TOKEN
-
 %%
+
     /* ===== Delim ===== */
 "," 	{ tokenString("delim", ","); }
 ";" 	{ tokenString("delim", ";"); }
@@ -103,8 +103,8 @@ scNotation  0*({float}|{integer})[Ee][\+\-]?0*{integer}
 }
 
     /* ===== Numbers ===== */
-{integer} { tokenString("integer", yytext); }
-{float} { tokenString("float", yytext); }
+{integer}    { tokenString("integer", yytext); }
+{float}      { tokenString("float", yytext); }
 {scNotation} { tokenString("scientific", yytext); }
 
     /* ===== Whitespace ===== */
@@ -195,7 +195,6 @@ scNotation  0*({float}|{integer})[Ee][\+\-]?0*{integer}
     BEGIN INITIAL;
 }
 
-
 \n {
     LIST;
     print();
@@ -237,7 +236,7 @@ int main( int argc, char **argv )
 void print(){
     if (Opt_Source)
         printf("%d:%s\n", linenum, buf);
-    ++linenum;
+    linenum++;
     buf[0] = '\0';
 }
 
