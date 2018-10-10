@@ -1,14 +1,11 @@
 %{
+// #define DEBUG
 #include <string.h>
 #define LIST                { strncat(buf, yytext, sizeof(buf) - strlen(buf) - 1); }
 #define STRCAT(s)           { strncat(str, s, sizeof(str) - strlen(str) - 1); }
 #define token(t)            { LIST; if (Opt_Token) printf("<%s>\n", #t); }
 #define tokenString(t, s)   { LIST; if (Opt_Token) printf("<%s:%s>\n", t, s); }
 #define MAX_LINE_LENGTH 257
-#define MAX_ID_LENGTH 257
-#ifndef ERR
-#define ERR stderr
-#endif
 int Opt_Source = 1;
 int Opt_Token = 1;
 int Opt_Statistic = 1;
@@ -28,6 +25,7 @@ typedef struct IdNode {
 }NODE;
 %}
 
+ws    [ \t]
 char    [a-zA-Z]
 digit    [0-9]
 nzero    [1-9]
@@ -35,7 +33,6 @@ integer    0|({nzero}({digit}*))
 float    {digit}+"."{digit}+
 SCInotation    ({digit}*(\.{digit}+)?)[Ee][+-]?{digit}+
 identifier    [a-z_A-Z][a-zA-Z_0-9]*
-ws    [ \t]
 
 %Start C_COMMENT
 %Start CPP_COMMENT
@@ -46,7 +43,6 @@ ws    [ \t]
 %Start PRAGMA_STAT
 %Start AFTER_PRAGMA_COMMENT
 %Start PRAG_C_COMMENT
-%Start PRAG_COMMENT_NEWLINE
 %%
     /* ===== COMMENT ===== */
 <INITIAL>"//" { /* start of C++ style comment */
@@ -136,14 +132,11 @@ ws    [ \t]
    LIST;
    BEGIN PRAG_C_COMMENT;
 }
-<PRAG_C_COMMENT>"*/" {
+<PRAG_C_COMMENT>.*"*/" {
    LIST;
-   BEGIN PRAG_COMMENT_NEWLINE;
+   BEGIN AFTER_PRAGMA_COMMENT;
 }
-<PRAG_COMMENT_NEWLINE>\n {
-   LIST;
-   print();
-}
+
 <PRAG_C_COMMENT>. {LIST;}
 <PRAGMA>\n     |
 <PRAGMA_SOU>\n       |
@@ -190,6 +183,9 @@ ws    [ \t]
     /* ===== IDENTIFIER ===== */
 <INITIAL>{identifier} {
     tokenString("id", yytext);
+#ifdef DEBUG
+    printf("\t insert: %s\n", yytext);
+#endif
     insert(yytext);
 }
 
@@ -295,7 +291,10 @@ void print(){
     buf[0] = '\0';
 }
 
-void error(){fprintf(stderr, "Error at line %d: %s\n", linenum, yytext); clear();}
+void error(){
+    fprintf(stderr, "Error at line %d: %s\n", linenum, yytext);
+    clear();
+}
 
 void clear(){
     while(head != NULL){
@@ -321,12 +320,21 @@ void insert(char *iden){
 
     if(find == 0){
         NODE* newNode = (NODE*)malloc(sizeof(NODE));
-        char *newId = (char*)malloc(sizeof(char)*258);
+        char *newId = (char*)malloc(sizeof(char)*MAX_LINE_LENGTH);
         strcpy(newId, iden);
         newNode->id = newId;
         newNode->count = 1;
-        newNode->next = head;
-        head = newNode;
+        newNode->next = NULL;
+        if(head == NULL){
+            head = newNode;
+        }
+        else{
+            current = head;
+            while(current->next != NULL){
+                current = current->next;
+            }
+            current->next = newNode;
+        }
     }
 }
 
