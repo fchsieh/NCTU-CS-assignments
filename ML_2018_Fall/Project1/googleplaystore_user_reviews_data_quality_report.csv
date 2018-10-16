@@ -1,0 +1,10 @@
+Continuous Features
+Feature,Count,Miss%,Card,Min,1st Qrt,Mean,Median,3rd Qrt,Max,Std Dev
+Sentiment Polarity,64295,41.78,6492,-1.0,0.0,0.18,0.15,0.4,1.0,0.35
+Sentiment Subjectivity,64295,41.78,4694,0.0,0.36,0.49,0.51,0.65,1.0,0.26
+
+Categorical Features
+Feature,Count,Miss%,Card,Mode,Mode Freq,Mode%,2nd Mode,2nd Mode Freq,2nd Mode%
+App name,64295,0.0,1074,"CBS Sports App - Scores, News, Stats & Watch Live",320,0.5,Angry Birds Classic,320,0.5
+Translated Review,64295,41.78,27995,Good,247,0.66,Nice,173,0.46
+Sentiment,64295,41.78,3,Positive,23998,64.11,Negative,8271,22.1

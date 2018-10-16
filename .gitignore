@@ -1,6 +1,6 @@
 .ignore/
 .working/
-
+ignore/
 
 *.o
 

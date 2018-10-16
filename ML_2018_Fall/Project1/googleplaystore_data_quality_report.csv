@@ -1,0 +1,18 @@
+Continuous Features
+Feature,Count,Miss%,Card,Min,1st Qrt,Mean,Median,3rd Qrt,Max,Std Dev
+Rating,10841,13.6,39,1.0,4.0,4.19,4.3,4.5,5.0,0.52
+Reviews,10841,0.0,6001,0.0,38.0,444111.93,2094.0,54768.0,78158306.0,2927493.64
+Size,10841,0.0,477,0.01M,4.9M,21.51M,13.0M,30.0M,100.0M,22.59M
+Installs,10841,0.0,21,0.0+,1000.0+,15462912.51+,100000.0+,5000000.0+,1000000000.0+,85021647.42+
+Price,10841,0.0,92,$0.0,$0.0,$1.03,$0.0,$0.0,$400.0,$15.95
+
+Categorical Features
+Feature,Count,Miss%,Card,Mode,Mode Freq,Mode%,2nd Mode,2nd Mode Freq,2nd Mode%
+App name,10841,0.0,9660,ROBLOX,9,0.08,"CBS Sports App - Scores, News, Stats & Watch Live",8,0.07
+Category,10841,0.01,33,FAMILY,1972,18.19,GAME,1144,10.55
+Type,10841,0.01,2,Free,10040,92.62,Paid,800,7.38
+Content Rating,10841,0.0,6,Everyone,8715,80.39,Teen,1208,11.14
+Genres,10841,0.01,119,Tools,842,7.77,Entertainment,623,5.75
+Last Updated,10841,0.0,1377,"August 3, 2018",326,3.01,"August 2, 2018",304,2.8
+Current Ver,10841,0.07,2831,Varies with device,1459,13.47,1.0,809,7.47
+Android Ver,10841,0.02,33,"4.1 and up",2451,22.61,"4.0.3 and up",1501,13.85

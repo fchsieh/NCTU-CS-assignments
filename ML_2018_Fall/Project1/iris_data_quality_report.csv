@@ -1,0 +1,10 @@
+Continuous Features
+Feature,Count,Miss%,Card,Min,1st Qrt,Mean,Median,3rd Qrt,Max,Std Dev
+sepal length,150,0.0,35,4.3,5.1,5.84,5.8,6.4,7.9,0.83
+sepal width,150,0.0,23,2.0,2.8,3.05,3.0,3.3,4.4,0.43
+petal length,150,0.0,43,1.0,1.6,3.76,4.35,5.1,6.9,1.76
+petal width,150,0.0,22,0.1,0.3,1.2,1.3,1.8,2.5,0.76
+
+Categorical Features
+Feature,Count,Miss%,Card,Mode,Mode Freq,Mode%,2nd Mode,2nd Mode Freq,2nd Mode%
+class,150,0.0,3,Iris-setosa,50,33.33,Iris-versicolor,50,33.33
