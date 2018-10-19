@@ -124,9 +124,9 @@
   <ItemGroup>
     <ClCompile Include="baiscDraw.cpp" />
     <ClCompile Include="basicGLUT.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="tmp.cpp" />
     <ClCompile Include="test.cpp" />
-    <ClCompile Include="viewingAndTransformation.cpp" />
+    <ClCompile Include="main.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

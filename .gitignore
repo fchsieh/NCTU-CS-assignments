@@ -2,5 +2,6 @@
 .working/
 ignore/
 
+# C/CPP exec files
 *.o
-
+*.exe

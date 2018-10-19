@@ -1,4 +1,7 @@
 {
-    "python.pythonPath": "D:\\CS\\Anaconda\\python.exe",
-    "editor.fontFamily": "Dejavu sans mono for powerline, monospace, FiraCode"
+    "files.associations": {
+        "*.l": "lex",
+        "iostream": "cpp",
+        "*.tcc": "cpp"
+    }
 }
