@@ -7,10 +7,10 @@
 using namespace std;
 
 //#define DEBUG_BUILDTABLE
-#define FINISH_JOB
+//#define FINISH_JOB
 
 void ReadFile();
-void OutputResult();
+void OutputResult(fstream&, int, vector<vector<int>>&, vector<int>&, int);
 int ExtractMin(vector<vector<int>>&);
 void Insert(vector<vector<int>>&, const int);
 void ReplaceX(string&, const string&, const string&);
@@ -22,19 +22,19 @@ int main() {
 
 void ReadFile() {
     int table_count = 0;
-    fstream file("input.txt", ios::in);
+    fstream infile("input.txt", infile.in);
+    fstream outfile("output.txt", outfile.out);
     string row_content;
     string insert;
     int used_method;  // 1 for insert, 2 for extract-min
     int minimum = 0;  // If use extract-min method, output minimum
 
-    // Total iter count
-    file >> table_count;
+    // Total iteration count
+    infile >> table_count;
 
 #ifdef DEBUG_BUILDTABLE
     cout << "Table count: " << table_count << "\n";
 #endif
-
     for (int i = 0; i < table_count; i++) {
         vector<vector<int>> YoungsTable;
         int row_count = 0;
@@ -45,12 +45,12 @@ void ReadFile() {
 #endif
         // ========== If method = 1, Build Insert array =========
         vector<int> insert_arr;
-        file >> used_method;
+        infile >> used_method;
         // Eat useless newlines
-        file >> ws >> ws;
+        infile >> ws >> ws;
         // Record insert numbers
         if (used_method == 1) {
-            getline(file, insert);
+            getline(infile, insert);
             stringstream stream(insert);
             int n;
             while (stream >> n) {
@@ -66,7 +66,7 @@ void ReadFile() {
         cout << "\n";
 #endif
 
-        while (getline(file, row_content)) {
+        while (getline(infile, row_content)) {
             row_count++;
             // ============== Convert x to INT_MAX ===========
             stringstream ss;
@@ -105,7 +105,8 @@ void ReadFile() {
             // Extract mode
             minimum = ExtractMin(YoungsTable);
         }
-// OutputResult();
+        OutputResult(outfile, used_method, YoungsTable, insert_arr, minimum);
+        if (i != table_count - 1) outfile << "\n";
 #ifdef FINISH_JOB
         if (used_method == 1) {
             cout << "Insert ";
@@ -130,7 +131,38 @@ void ReadFile() {
     }
 }
 
-void OutputResult() {}
+void OutputResult(fstream& outfile, int method, vector<vector<int>>& young,
+                  vector<int>& insert_arr, int min) {
+    int row_count = young.size();
+    int col_count = young[0].size();
+
+    // =========== Write to output.txt ==============
+    if (method == 1) {
+        // ======= Use: Insert mode ========
+        outfile << "Insert ";
+        for (int i = 0; i < insert_arr.size(); i++) {
+            outfile << insert_arr[i];
+            if (i != insert_arr.size() - 1) outfile << " ";
+        }
+        outfile << "\n";
+        // =================================
+    } else if (method == 2) {
+        // ======= Use: Extract mode =======
+        outfile << "Extract-min " << min << "\n";
+        // =================================
+    }
+
+    for (int i = 0; i < row_count; i++) {
+        for (int j = 0; j < col_count; j++) {
+            if (young[i][j] == INT_MAX)
+                outfile << "x";
+            else
+                outfile << young[i][j];
+            if (j != col_count - 1) outfile << " ";
+        }
+        outfile << "\n";
+    }
+}
 
 int ExtractMin(vector<vector<int>>& young) {
     int minimum = young[0][0];
