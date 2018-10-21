@@ -9,6 +9,9 @@ using namespace std;
 //#define DEBUG_BUILDTABLE
 //#define FINISH_JOB
 
+// Use INT_MAX to represent INFINITE
+#define INF INT_MAX
+
 void ReadFile();
 void OutputResult(fstream&, int, vector<vector<int>>&, vector<int>&, int);
 int ExtractMin(vector<vector<int>>&);
@@ -68,12 +71,12 @@ void ReadFile() {
 
         while (getline(infile, row_content)) {
             row_count++;
-            // ============== Convert x to INT_MAX ===========
+            // ============== Convert x to INF ===========
             stringstream ss;
             ss.clear();
-            ss << INT_MAX;
-            string STR_INTMAX = ss.str();
-            ReplaceX(row_content, "x", STR_INTMAX);
+            ss << INF;
+            string STR_INF = ss.str();
+            ReplaceX(row_content, "x", STR_INF);
             // ===============================================
             if (row_content.length() == 0) break;
             vector<int> v;
@@ -118,7 +121,7 @@ void ReadFile() {
         }
         for (int i = 0; i < row_count; i++) {
             for (int j = 0; j < col_count; j++) {
-                if (YoungsTable[i][j] == INT_MAX)
+                if (YoungsTable[i][j] == INF)
                     cout << "x";
                 else
                     cout << YoungsTable[i][j];
@@ -154,7 +157,7 @@ void OutputResult(fstream& outfile, int method, vector<vector<int>>& young,
 
     for (int i = 0; i < row_count; i++) {
         for (int j = 0; j < col_count; j++) {
-            if (young[i][j] == INT_MAX)
+            if (young[i][j] == INF)
                 outfile << "x";
             else
                 outfile << young[i][j];
@@ -166,21 +169,23 @@ void OutputResult(fstream& outfile, int method, vector<vector<int>>& young,
 
 int ExtractMin(vector<vector<int>>& young) {
     int minimum = young[0][0];
+    int row_count = young.size();
+    int col_count = young[0].size();
     int row = 0;
     int col = 0;
 
-    while (row < young.size() && col < young[0].size()) {
+    while (row < row_count && col < col_count) {
         int cur = young[row][col];
         int original_row = row;
         int original_col = col;
-        int right = INT_MAX;
-        int down = INT_MAX;
+        int right = INF;
+        int down = INF;
 
-        if (row < young.size() - 1) down = young[row + 1][col];
-        if (col < young[0].size() - 1) right = young[row][col + 1];
+        if (row < row_count - 1) down = young[row + 1][col];
+        if (col < col_count - 1) right = young[row][col + 1];
 
-        if (right == INT_MAX && down == INT_MAX) {
-            young[row][col] = INT_MAX;
+        if (right == INF && down == INF) {
+            young[row][col] = INF;
             break;
         } else if (down <= right)
             row++;
@@ -235,7 +240,7 @@ void Insert(vector<vector<int>>& young, const int insert) {
 
 void ReplaceX(string& str, const string& replace, const string& to) {
     // Replace x in input file
-    // To INT_MAX (as inf)
+    // To INF
     if (replace.empty()) return;
     size_t start_pos = 0;
     while ((start_pos = str.find(replace, start_pos)) != string::npos) {
