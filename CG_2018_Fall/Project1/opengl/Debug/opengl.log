@@ -1,3 +1,0 @@
-﻿  main.cpp
-d:\cs\github\nctu-cs-assignments\cg_2018_fall\project1\opengl\main.cpp(90): warning C4065: switch 陳述式包含 'default'，但沒有 'case' 標籤
-  opengl.vcxproj -> D:\CS\Github\NCTU-CS-assignments\CG_2018_Fall\Project1\Debug\opengl.exe
