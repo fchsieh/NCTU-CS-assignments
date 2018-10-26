@@ -2,6 +2,10 @@
 .working/
 ignore/
 
+# VS project
+.vs/
+
 # C/CPP exec files
 *.o
 *.exe
+
