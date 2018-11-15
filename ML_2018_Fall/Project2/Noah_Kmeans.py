@@ -1,33 +1,34 @@
 # coding: utf-8
-
-# In[1]:
-
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
+
 # For implement Kmeans
 import random
 from copy import deepcopy
+
+# For accuracy
+from sklearn.metrics import confusion_matrix
+import seaborn as sns
+
 # For cost function
 from scipy.spatial import distance
 
 plt.style.use("ggplot")
 
-# In[2]:
-
+# Read data and do preprocessing
 data = pd.read_csv("./datasets/data_noah.csv")
+mapping = {"CH": 0, "FF": 1, "CU": 2}
+data = data.replace({"pitch_type": mapping})
 x = data["x"].values
 y = data["y"].values
+pitch_type = data["pitch_type"].values
 Noah = np.array(list(zip(x, y)))
 
-# In[3]:
-
 # Plotting values
-plt.xlabel("Horizontal movement(x)")
-plt.ylabel("Vertical movement(y)")
+plt.xlabel("Horizontal movement (x)")
+plt.ylabel("Vertical movement (y)")
 plt.scatter(x, y, c="black", s=5)
-
-# In[4]:
 
 
 # Calculate Euclidean distance
@@ -35,12 +36,8 @@ def EuclideanDist(a, b, ax=1):
     return np.linalg.norm(a - b, axis=ax)
 
 
-# In[5]:
-
 # Number  of clusters
 k = 3
-
-# In[6]:
 
 
 # Implement kmeans
@@ -73,26 +70,44 @@ def kmeans(k, dataset):
     return clusters, center
 
 
-# In[7]:
-
 colors = ['r', 'g', 'b']
 clusters, center = kmeans(3, Noah)
 fig, ax = plt.subplots(figsize=(10, 7))
 points = None
 for i in range(k):
     points = np.array([Noah[j] for j in range(len(Noah)) if clusters[j] == i])
-    ax.scatter(points[:, 0], points[:, 1], s=7, c=colors[i], label=colors[i])
-ax.scatter(center[:, 0], center[:, 1], marker="*", s=200, c="black")
-plt.xlabel("Horizontal movement")
-plt.ylabel("Vertical movement")
+    ax.scatter(points[:, 0], points[:, 1], s=5, c=colors[i], label=colors[i])
+ax.scatter(center[:, 0], center[:, 1], marker="*", s=250, c="black")
+ax.legend(["CH", "FF", "CU"])
+plt.xlabel("Horizontal movement (x)")
+plt.ylabel("Vertical movement (y)")
 plt.title("Kmeans result")
-
-# In[8]:
-
 # Save result
 fig.savefig("Kmeans_result.png")
 
-# In[9]:
+
+# Build accuracy score function
+def accuracy(y_true, y_pred):
+    total = len(y_true)
+    TP = 0
+    for i in range(len(y_true)):
+        if y_pred[i] == y_true[i]:
+            TP += 1
+    return TP / total
+
+
+# Calculate accuracy
+fig, ax = plt.subplots(figsize=(10, 7))
+cm = confusion_matrix(pitch_type, clusters)
+sns.heatmap(cm, annot=True, ax=ax, fmt="d")
+ax.set_xlabel("Predicted labels")
+ax.set_ylabel("True labels")
+ax.set_title("Confusion matrix")
+ax.xaxis.set_ticklabels(["CH", "FF", "CU"])
+ax.yaxis.set_ticklabels(["CH", "FF", "CU"])
+# Save result
+fig.savefig("Confusion_matrix.png")
+print("Accuracy of using x and y: ", accuracy(pitch_type, clusters))
 
 
 # Show why there is 3 clusters
@@ -104,8 +119,6 @@ def wcss(k, points, centers):
     return wcss
 
 
-# In[10]:
-
 wcss_res = []
 for k in range(1, 11):
     points = []
@@ -116,33 +129,20 @@ for k in range(1, 11):
         points.append(point)
     wcss_res.append(wcss(k, points, center))
 
-# In[11]:
-
 k = range(1, 11)
 fig, ax = plt.subplots(figsize=(10, 7))
 plt.plot(k, wcss_res)
 plt.title("Elbow method")
 plt.xlabel("k clusters")
 plt.ylabel("wcss")
-
-# In[12]:
-
 # save result of elbow method
 fig.savefig("elbow_method.png")
 
-# In[13]:
-
-# Calculate accuracy
-
-# In[14]:
-
 # Use another two or more attributes to partition
-x = data["spin"].values
-y = data["speed"].values
+x = data["tstart"].values
+y = data["y"].values
 NewData = np.array(list(zip(x, y)))
 plt.scatter(x, y, c="black", s=5)
-
-# In[15]:
 
 clusters, center = kmeans(3, NewData)
 colors = ['r', 'g', 'b']
@@ -152,18 +152,27 @@ for i in range(3):
     point = np.array(
         [NewData[j] for j in range(len(NewData)) if clusters[j] == i])
     points.append(point)
-    ax.scatter(point[:, 0], point[:, 1], s=7, c=colors[i], label=colors[i])
-ax.scatter(center[:, 0], center[:, 1], marker="*", s=200, c="black")
-plt.xlabel("spin")
-plt.ylabel("speed")
-plt.title("Kmeans result 2")
-
-# In[16]:
-
+    ax.scatter(point[:, 0], point[:, 1], s=5, c=colors[i], label=colors[i])
+ax.scatter(center[:, 0], center[:, 1], marker="*", s=250, c="black")
+ax.legend(["CH", "FF", "CU"])
+plt.xlabel("tsart")
+plt.ylabel("Vertical movement (y)")
+plt.title("Kmeans result, tstart and Vertical movement")
 # Save result2
 fig.savefig("Kmeans_result2.png")
 
-# In[17]:
+# Calculate accuracy
+fig, ax = plt.subplots(figsize=(10, 7))
+cm = confusion_matrix(pitch_type, clusters)
+sns.heatmap(cm, annot=True, ax=ax, fmt="d")
+ax.set_xlabel("Predicted labels")
+ax.set_ylabel("True labels")
+ax.set_title("Confusion matrix, tstart and Vertical movement")
+ax.xaxis.set_ticklabels(["CH", "FF", "CU"])
+ax.yaxis.set_ticklabels(["CH", "FF", "CU"])
+# Save result
+fig.savefig("Confusion_matrix2.png")
+print("Accuracy of using tstart and y: ", accuracy(pitch_type, clusters))
 
 # Do elbow method again with new data
 wcss_res = []
@@ -176,16 +185,11 @@ for k in range(1, 11):
         points.append(point)
     wcss_res.append(wcss(k, points, center))
 
-# In[18]:
-
 k = range(1, 11)
 fig, ax = plt.subplots(figsize=(10, 7))
 plt.plot(k, wcss_res)
-plt.title("Elbow method, new data")
+plt.title("Elbow method, tstart and Vertical movement")
 plt.xlabel("k clusters")
 plt.ylabel("wcss")
-
-# In[19]:
-
 # save result of elbow method of new data
 fig.savefig("elbow_method2.png")
