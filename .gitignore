@@ -9,3 +9,4 @@ ignore/
 *.o
 *.exe
 
+.ipynb_checkpoints/
