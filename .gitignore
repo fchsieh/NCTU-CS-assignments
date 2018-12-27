@@ -4,9 +4,11 @@ ignore/
 
 # VS project
 .vs/
+.vscode/
 
 # C/CPP exec files
 *.o
 *.exe
 
 .ipynb_checkpoints/
+__pycache__/
