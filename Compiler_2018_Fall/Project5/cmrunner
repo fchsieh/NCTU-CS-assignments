@@ -1,0 +1,40 @@
+#!/bin/bash
+usage() { echo "Usage: $0 [-f <file>][-i <input>]" 1>&2; exit 1; }
+# get arguments
+while getopts ":f:i:" o; do
+    case "${o}" in
+        f)
+            file=${OPTARG}
+        ;;
+        i)
+            input=${OPTARG}
+        ;;
+        *)
+            usage
+        ;;
+    esac
+done
+shift $((OPTIND-1))
+basef=$(basename ${file})
+basef=${basef%.*}
+# rebuild compiler(assume not exists)
+cd cm-compiler
+make
+# build java bytecode
+./parser ../${file}
+
+# assemble
+jfile=${file%.*}
+jfile="$jfile.j"
+java -jar ../jasmin/jasmin.jar ../${jfile}
+
+# run code and output result
+echo ""
+echo "=========================================="
+echo "|                 Result                 |"
+echo "=========================================="
+java ${basef}
+
+rm -f ../${jfile}
+rm -f *.class
+rm parser
