@@ -18,7 +18,10 @@ extern bool semError;
 FILE *output;
 char *filename;
 
-char *remove_ext(char *mystr, char dot, char sep);
+// global var q's
+struct idQueue *idq;
+struct valQueue *valq;
+// struct realQueue *realq;
 
 int main(int argc, char **argv) {
     if (argc == 1) {
@@ -29,27 +32,16 @@ int main(int argc, char **argv) {
             fprintf(stderr, "Open file error\n");
             exit(-1);
         }
-
-        filename = malloc(sizeof(char) * (strlen(argv[1]) + 1));
-        memset(filename, 0, sizeof(filename));
-        filename = remove_ext(argv[1], '.', '/');
-
-        // write to filename.j
-        char *filenameWithJ = malloc(sizeof(char) * (strlen(filename) + 3));
-        memset(filenameWithJ, 0, sizeof(filenameWithJ));
-        strcpy(filenameWithJ, filename);
-        strcat(filenameWithJ, ".j");
-        output = fopen(filenameWithJ, "w");
-
-        // read file's name
-        filename = basename(filename);
+        filename = "output";
+        output = fopen("output.j", "w");
         codegen_InitProgram();
         yyin = fp;
     } else {
         fprintf(stderr, "Usage: ./parser [filename]\n");
         exit(0);
     }
-
+    idq = initIDQueue();
+    valq = initValQueue();
     symTable = initSymTab();  // create symbol table
     yyparse();                // main procedure
 
@@ -57,34 +49,15 @@ int main(int argc, char **argv) {
         fprintf(stdout, "\n|--------------------------------|\n");
         fprintf(stdout, "|  There is no syntactic error!  |\n");
         fprintf(stdout, "|--------------------------------|\n");
+        fclose(output);
+        exit(255);
     } else {
         fprintf(stdout, "\n|-------------------------------------------|\n");
         fprintf(stdout, "| There is no syntactic and semantic error! |\n");
         fprintf(stdout, "|-------------------------------------------|\n");
+        fclose(output);
+        exit(0);
     }
-    fclose(output);
+
     exit(0);
-}
-
-char *remove_ext(char *mystr, char dot, char sep) {
-    // get file name without extension or "/" in path
-    char *retstr, *lastdot, *lastsep;
-
-    if (mystr == NULL) return NULL;
-    if ((retstr = malloc(strlen(mystr) + 1)) == NULL) return NULL;
-
-    strcpy(retstr, mystr);
-    lastdot = strrchr(retstr, dot);
-    lastsep = (sep == 0) ? NULL : strrchr(retstr, sep);
-
-    if (lastdot != NULL) {
-        if (lastsep != NULL) {
-            if (lastsep < lastdot) {
-                *lastdot = '\0';
-            }
-        } else {
-            *lastdot = '\0';
-        }
-    }
-    return retstr;
 }

@@ -1,16 +1,8 @@
-int foo();
-void bar() { print "in bar\n"; }
-int main() {
-    foo();
-    print "\nhello world!!!!!!!!\n";
-    bar();
-    print "\nEnd of world\n";
-    return 0;
-}
-int foo() {
-    print "in foo\n";
-    print 123;
-    print "\n";
-    print 55;
-    return 87;
+int global, test = 5;
+double t = 3.14;
+bool fal = true, ha, nope = true;
+
+void main() {
+    global = test + 43;
+    print global;  // eerr
 }

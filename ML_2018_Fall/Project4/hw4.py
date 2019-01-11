@@ -119,9 +119,7 @@ def backprop(params, input_size, hidden_size, num_labels, X, y, learning_rate):
 
     theta1_grad[:, 1:] += (theta1[:, 1:] * learning_rate) / m
     theta2_grad[:, 1:] += (theta2[:, 1:] * learning_rate) / m
-
     grad = np.concatenate((np.ravel(theta1_grad), np.ravel(theta2_grad)))
-
     return J, grad
 
 

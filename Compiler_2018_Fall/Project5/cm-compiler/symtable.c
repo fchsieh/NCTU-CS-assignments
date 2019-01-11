@@ -69,7 +69,8 @@ void insertFuncIntoSymTable(SymTable *table, char *id, ParamSemantic *params,
             }
         }
 
-        SymNode *newNode = createNode(id, 0, retType, FUNCTION_t, funcParam);
+        SymNode *newNode =
+            createNode(id, 0, retType, FUNCTION_t, funcParam, -1);
         newNode->isFuncDefine = isDefine;
         insertIntoSymTable(table, newNode);
     }
@@ -97,7 +98,7 @@ bool insertParamIntoSymTable(SymTable *table, ParamSemantic *params,
                     } else {
                         newNode =
                             createNode(idPtr->value, scope, parPtr->extType,
-                                       PARAMETER_t, NULL);
+                                       PARAMETER_t, NULL, varNumber++);
                         insertIntoSymTable(table, newNode);
                     }
                 }
@@ -303,7 +304,7 @@ void printSymTable(SymTable *table, int scope) {
 
 // ============= Create SymNodes  =============
 SymNode *createNode(char *name, int scope, ExtType *scalarType, KIND kind,
-                    void *attr) {
+                    void *attr, int varNumber) {
     SymNode *newNode = malloc(sizeof(SymNode));
     // set node's name
     newNode->name = malloc(sizeof(char) * 32);
@@ -341,6 +342,7 @@ SymNode *createNode(char *name, int scope, ExtType *scalarType, KIND kind,
 
     newNode->next = NULL;
     newNode->prev = NULL;
+    newNode->varNumber = varNumber;
     return newNode;
 }
 
@@ -368,7 +370,7 @@ ConstAttr *createConstantAttribute(BTYPE type, void *value) {
             strcpy(newConstAttr->value.stringVal, (char *)value);
             break;
         case BOOLEAN_t:
-            newConstAttr->value.booleanVal = *(int *)value;
+            newConstAttr->value.booleanVal = *(bool *)value;
             break;
         case DOUBLE_t:
             newConstAttr->value.doubleVal = *(double *)value;
@@ -530,4 +532,5 @@ ExtType *copyExtType(ExtType *src) {
         return dest;
     }
 }
+
 // ============================================

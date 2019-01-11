@@ -1,6 +1,6 @@
 MAKEFLAGS += --silent
-TARGET = parser
-OBJECT = lex.yy.c y.tab.c y.tab.o lex.yy.o y.output parser y.tab.h main.o semcheck.o symtable.o codegen.o
+TARGET = compiler
+OBJECT = lex.yy.c y.tab.c y.tab.o lex.yy.o y.output compiler y.tab.h main.o semcheck.o symtable.o codegen.o
 DELFILES = lex.yy.c y.tab.c y.tab.o lex.yy.o y.output y.tab.h main.o semcheck.o symtable.o codegen.o
 CC = gcc -g
 LEX = flex
@@ -10,7 +10,7 @@ LIBS = -lfl
 
 all: $(TARGET)
 
-parser: y.tab.o lex.yy.o main.o semcheck.o symtable.o codegen.o
+$(TARGET): y.tab.o lex.yy.o main.o semcheck.o symtable.o codegen.o
 	$(CC) -o $(TARGET) y.tab.o lex.yy.o main.o semcheck.o symtable.o codegen.o $(LIBS)
 	rm -f $(DELFILES)
 

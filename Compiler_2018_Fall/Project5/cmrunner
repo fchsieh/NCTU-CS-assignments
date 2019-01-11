@@ -19,22 +19,24 @@ basef=$(basename ${file})
 basef=${basef%.*}
 # rebuild compiler(assume not exists)
 cd cm-compiler
-make
+make clean && make
 # build java bytecode
-./parser ../${file}
+./compiler ../${file}
 
-# assemble
-jfile=${file%.*}
-jfile="$jfile.j"
-java -jar ../jasmin/jasmin.jar ../${jfile}
+if [ $? -eq 0 ]; then
+    # assemble
+    jfile="output.j"
+    java -jar ../jasmin/jasmin.jar ./${jfile}
 
-# run code and output result
-echo ""
-echo "=========================================="
-echo "|                 Result                 |"
-echo "=========================================="
-java ${basef}
+    # run code and output result
+    echo ""
+    echo "=========================================="
+    echo "|                 Result                 |"
+    echo "=========================================="
+    java "output"
 
-rm -f ../${jfile}
-rm -f *.class
-rm parser
+    #rm -f ./${jfile}
+    rm -f *.class
+else
+    echo "Compile error"
+fi

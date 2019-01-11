@@ -22,12 +22,23 @@ PARERROR paramError;
 bool semError = false;
 int scope = 0;
 int inloop = 0;
-
+int varNumber = 1;
+extern FILE *output;
 int yylex();
 
 // for code generate
 bool isMain = false;
+bool save = false;
+struct insList insList;
+extern struct loop_stack loopStack;
+extern struct cond_stack condStack;
+extern int label_count;
+int nextNumber = 0;
+int globalCount = 0;
 
+// global var
+extern struct idQueue *idq;
+extern struct valQueue *valq;
 %}
 
 %union {
@@ -44,6 +55,7 @@ bool isMain = false;
     struct EXPR_SEM_NODE *exprNode;
     struct CONSTPARAM *constNode;
     struct VARDECL *varDeclNode;
+    struct CheckGlobal *checkGlobal;
 };
 
 %token	LE_OP NE_OP GE_OP EQ_OP AND_OP OR_OP
@@ -64,11 +76,10 @@ bool isMain = false;
 %type<intVal> relation_operator dimension
 %type<varDeclNode> identifier_list
 
-
 %start program
 %%
 
-program :decl_list funct_def decl_and_def_list
+program : decl_list funct_def decl_and_def_list
         {
             if(Opt_Symbol == 1)
                 printSymTable( symTable, scope );
@@ -106,6 +117,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
                 }
                 if(strcmp($2, "main") == 0){    // is main function
                     codegen_BuildMainFunction();
+                    // assign global variable's value
                     isMain = true;
                 }
                 else {
@@ -116,6 +128,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
             }
             funct_def_end
             {
+                codegen_ExprIns();
                 if(isMain) {
                     // main function is void type
                     codegen_FunctionEnd(createExtType(VOID_t));
@@ -128,7 +141,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
           | scalar_type ID L_PAREN parameter_list R_PAREN   // function with return and param
             {
                 funcReturn = $1;
-
+                varNumber = 0;
                 paramError = checkFuncParam( $4 );
                 bool canInsert = false;
                 switch( paramError ){
@@ -175,6 +188,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
             }
             funct_def_end
             {
+                codegen_ExprIns();
                 if(isMain) {
                     // main function is void type
                     codegen_FunctionEnd(createExtType(VOID_t));
@@ -183,6 +197,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
                     codegen_FunctionEnd($1);
                 }
                 isMain = false;
+                varNumber = 1;
             }
           | VOID ID L_PAREN R_PAREN
             {
@@ -207,6 +222,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
             }
             compound_statement
             { 
+                codegen_ExprIns();
                 funcReturn = NULL;
                 if(isMain) {
                     // main function is void type
@@ -220,7 +236,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
           | VOID ID L_PAREN parameter_list R_PAREN
             {
                 funcReturn = createExtType(VOID_t);
-
+                varNumber = 0;
                 paramError = checkFuncParam( $4 );
                 bool canInsert = false;
                 switch( paramError ){
@@ -264,6 +280,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
             }
             compound_statement
             { 
+                codegen_ExprIns();
                 funcReturn = NULL;
                 if(isMain) {
                     // main function is void type
@@ -273,6 +290,7 @@ funct_def : scalar_type ID L_PAREN R_PAREN // function with return
                     codegen_FunctionEnd(createExtType(VOID_t));
                 }
                 isMain = false;
+                varNumber = 1;
             }
           ;
 
@@ -381,7 +399,16 @@ var_decl : scalar_type identifier_list SEMICOLON
                     if( checkRedeclaration( symTable, ptr->para->idlist->value, scope ) == false ) { }
                     else {
                         if( checkVarInitValue( $1, ptr, symTable, scope ) ==  true ){
-                            SymNode *newNode = createNode( ptr->para->idlist->value, scope, ptr->para->extType, VARIABLE_t, 0 );
+                            SymNode *newNode;
+                            if(scope == 0) { // is global variable
+                                newNode = createNode( ptr->para->idlist->value, scope, ptr->para->extType, VARIABLE_t, 0, 0 );
+                                codegen_GlobalVar(ptr, $1);
+                                // fprintf(output , "; name: %s\n", ptr->para->idlist->value);
+                                globalCount++;
+                            }
+                            else {
+                                newNode = createNode( ptr->para->idlist->value, scope, ptr->para->extType, VARIABLE_t, 0, varNumber++ );
+                            }
                             insertIntoSymTable( symTable, newNode );
                         }
                     }
@@ -396,16 +423,22 @@ identifier_list : identifier_list COMMA ID
                     VarDecl *vptr = createVarDecl( ptr, 0 );
                     concateParam("VarDecl", $1, vptr );
                     $$ = $1;
+                    idEnQ(idq, $3, false);
                 }
-                | identifier_list COMMA ID ASSIGN_OP logical_expression
+                | identifier_list COMMA ID ASSIGN_OP
+                {
+                    save = true;
+                    idEnQ(idq, $3, true);
+                }
+                logical_expression
                 {
                     ParamSemantic *ptr = createParam( createIdList( $3 ), createExtType( VOID_t ) );
-                    VarDecl *vptr = createVarDecl( ptr, $5 );
+                    VarDecl *vptr = createVarDecl( ptr, $6 );
                     vptr->isArray = true;
                     vptr->isInit = true;
                     concateParam("VarDecl", $1, vptr );
                     $$ = $1;
-
+                    save = false;
                 }
                 | identifier_list COMMA array_decl ASSIGN_OP initial_array
                 {
@@ -433,16 +466,19 @@ identifier_list : identifier_list COMMA ID
                     $$ = createVarDecl( $1 , 0 );
                     $$->isArray = true;
                 }
-                | ID ASSIGN_OP logical_expression
+                | ID ASSIGN_OP {save = true; } logical_expression
                 {
                     ParamSemantic *ptr = createParam( createIdList( $1 ), createExtType( VOID_t ) );
-                    $$ = createVarDecl( ptr, $3 );
+                    $$ = createVarDecl( ptr, $4 );
                     $$->isInit = true;
+                    save = false;
+                    idEnQ(idq, $1, true);
                 }
                 | ID
                 {
                     ParamSemantic *ptr = createParam( createIdList( $1 ), createExtType( VOID_t ) );
                     $$ = createVarDecl( ptr, 0 );
+                    idEnQ(idq, $1, false);
                 }
                 ;
 
@@ -475,17 +511,17 @@ const_decl 	: CONST scalar_type const_list SEMICOLON
                                     printError(ConstDeclTypeMismatch);
                                 }
                                 else{
-                                    newNode = createNode( ptr->name, scope, $2, CONSTANT_t, ptr->value );
+                                    newNode = createNode( ptr->name, scope, $2, CONSTANT_t, ptr->value, -1);
                                     insertIntoSymTable( symTable, newNode );
                                 }
                             }
                             else{
-                                newNode = createNode( ptr->name, scope, $2, CONSTANT_t, ptr->value );
+                                newNode = createNode( ptr->name, scope, $2, CONSTANT_t, ptr->value, -1 );
                                 insertIntoSymTable( symTable, newNode );
                             }
                         }
                         else{
-                            newNode = createNode( ptr->name, scope, $2, CONSTANT_t, ptr->value );
+                            newNode = createNode( ptr->name, scope, $2, CONSTANT_t, ptr->value, -1 );
                             insertIntoSymTable( symTable, newNode );
                         }
                     }
@@ -565,10 +601,13 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
                         if( $3->isDeref == false ) {
                             flagRHS = checkExistence( symTable, $3, scope, false );
                         }
-                        if( flagLHS == true && flagRHS == true )
+                        if( flagLHS == true && flagRHS == true ) {
                             checkAssignmentTypeMatch( $1, $3 );
+                            codegen_SaveExpr($1, $3);
+                            codegen_ExprIns();
+                        }
                     }
-                 | PRINT { codegen_PrintStart(); } logical_expression SEMICOLON
+                 | PRINT { codegen_PrintStart(); } logical_expression { codegen_ExprIns(); } SEMICOLON
                     {
                         if ($3->extType->dim != 0) {
                             printError(StatementIsArrType);
@@ -581,32 +620,103 @@ simple_statement : variable_reference ASSIGN_OP logical_expression SEMICOLON
                             if ($2->extType->dim != 0) {
                                 printError(StatementIsArrType);
                             }
+                            codegen_Read($2);
                         }
                     }
                  ;
 
 conditional_statement : IF L_PAREN conditional_if  R_PAREN compound_statement
+                        {
+                            codegen_ExprIns();
+                            codegen_GenToList("Lfalse_%d:\n", loopStack.stack[loopStack.top]);
+                            codegen_ExprIns();
+                            loopStack.top--;
+                        }
                       | IF L_PAREN conditional_if  R_PAREN compound_statement
+                        {
+                            codegen_ExprIns();
+                            codegen_GenToList("goto Lexit_%d\nLfalse_%d:\n", loopStack.stack[loopStack.top], loopStack.stack[loopStack.top]);
+                            codegen_ExprIns();
+                        }
                         ELSE compound_statement
+                        {
+                            codegen_ExprIns();
+                            codegen_GenToList("Lexit_%d:\n", loopStack.stack[loopStack.top]);
+                            loopStack.top--;
+                            codegen_ExprIns();
+                        }
                       ;
 
-conditional_if : logical_expression { checkBooleanExpr( $1 ); }
+conditional_if : logical_expression
+                {
+                    loopStack.top++;
+                    label_count++;
+                    loopStack.stack[loopStack.top] = label_count;
+                    checkBooleanExpr( $1 );
+                    codegen_GenToList("ifeq Lfalse_%d\n", loopStack.stack[loopStack.top]);
+                }
                ;
 
-while_statement : WHILE L_PAREN logical_expression { checkBooleanExpr( $3 ); } R_PAREN { inloop++; }
-                    compound_statement { inloop--; }
-                | { inloop++; } DO compound_statement WHILE L_PAREN logical_expression R_PAREN SEMICOLON
+while_statement : WHILE
+                {
+                    loopStack.top++;
+                    label_count++;
+                    loopStack.stack[loopStack.top] = label_count;
+                    codegen_GenToList("Lbegin_%d:\n", loopStack.stack[loopStack.top]);
+                    codegen_ExprIns();
+                }
+                  L_PAREN logical_expression
+                {
+                    checkBooleanExpr( $4 );
+                    codegen_GenToList("ifeq Lexit_%d\n", loopStack.stack[loopStack.top]);
+                    codegen_ExprIns();
+                } 
+                  R_PAREN { inloop++; }
+                  compound_statement
+                { 
+                    codegen_GenToList("goto Lbegin_%d\nLexit_%d:\n", loopStack.stack[loopStack.top], loopStack.stack[loopStack.top]);
+                    codegen_ExprIns();
+                    inloop--;
+                    loopStack.top--;
+                }
+                | { inloop++; } DO compound_statement 
+                  WHILE L_PAREN logical_expression R_PAREN SEMICOLON
                     {
                          checkBooleanExpr( $6 );
                          inloop--;
-
                     }
                 ;
 
 
 
-for_statement : FOR L_PAREN initial_expression SEMICOLON control_expression SEMICOLON increment_expression R_PAREN  { inloop++; }
-                    compound_statement  { inloop--; }
+for_statement : FOR
+                {
+                    loopStack.top++;
+                    label_count++;
+                    loopStack.stack[loopStack.top] = label_count;
+                }
+                L_PAREN initial_expression SEMICOLON 
+                {
+                    codegen_GenToList("Lbegin_%d:\n", loopStack.stack[loopStack.top]);
+                    codegen_ExprIns();
+                }
+                control_expression SEMICOLON
+                {
+                    codegen_GenToList("ifeq Lexit_%d\ngoto Lcontent_%d\nLinc_%d:\n", loopStack.stack[loopStack.top],loopStack.stack[loopStack.top],loopStack.stack[loopStack.top]);
+                    codegen_ExprIns();
+                }
+                increment_expression R_PAREN
+                {
+                    codegen_GenToList("goto Lbegin_%d\nLcontent_%d:\n",loopStack.stack[loopStack.top],loopStack.stack[loopStack.top]);
+                    codegen_ExprIns();
+                }
+                compound_statement
+                {
+                    codegen_GenToList("goto Linc_%d\nLexit_%d:\n", loopStack.stack[loopStack.top], loopStack.stack[loopStack.top]);
+                    codegen_ExprIns();
+                    inloop--;
+                    loopStack.top--;
+                }
               ;
 
 initial_expression : initial_expression COMMA statement_for
@@ -619,6 +729,7 @@ initial_expression : initial_expression COMMA statement_for
 control_expression : control_expression COMMA statement_for
                    {
                         printError(ControlStatNotBool);
+
                    }
                    | control_expression COMMA logical_expression
                    {
@@ -658,6 +769,8 @@ statement_for 	: variable_reference ASSIGN_OP logical_expression
                         // if both exists, check their type
                         if( left == true && right == true )
                             checkAssignmentTypeMatch( $1, $3 );
+                        // load variables in for loop
+                         codegen_SaveExpr($1, $3);
                     }
                     ;
 
@@ -665,12 +778,12 @@ statement_for 	: variable_reference ASSIGN_OP logical_expression
 function_invoke_statement : ID L_PAREN logical_expression_list R_PAREN SEMICOLON
                             {
                                 $$ = checkFuncInvoke( $1, $3, symTable, scope );
-                                codegen_FuncInvoke($1, false);
+                                codegen_FunctionInvoke($1, false);
                             }
                           | ID L_PAREN R_PAREN SEMICOLON
                             {
                                 $$ = checkFuncInvoke( $1, 0, symTable, scope );
-                                codegen_FuncInvoke($1, false);
+                                codegen_FunctionInvoke($1, false);
                             }
                           ;
 
@@ -689,6 +802,13 @@ jump_statement : CONTINUE SEMICOLON
                | RETURN logical_expression SEMICOLON
                 {
                     checkReturnStatement( $2, funcReturn );
+                    codegen_ExprIns();
+                    if(isMain){
+                        codegen_FunctionReturn(createExtType(VOID_t));
+                    }
+                    else {
+                        codegen_FunctionReturn($2->extType);
+                    }
                 }
                ;
 
@@ -703,6 +823,7 @@ variable_reference : ID { $$ = createExprSem( $1 ); }
 logical_expression : logical_expression OR_OP logical_term
                     {
                         checkAndOrOp( $1, OR_t, $3 );
+                        codegen_BooleanOp($1, OR_t, $3);
                         $$ = $1;
                     }
                    | logical_term { $$ = $1; }
@@ -711,6 +832,7 @@ logical_expression : logical_expression OR_OP logical_term
 logical_term : logical_term AND_OP logical_factor
                 {
                     checkAndOrOp( $1, AND_t, $3 );
+                    codegen_BooleanOp($1, AND_t, $3);
                     $$ = $1;
                 }
              | logical_factor { $$ = $1; }
@@ -719,6 +841,7 @@ logical_term : logical_term AND_OP logical_factor
 logical_factor : NOT_OP logical_factor
                 {
                     checkUnaryNOT( $2 );
+                    codegen_BooleanOp($2, NOT_t, $2);
                     $$ = $2;
                 }
                | relation_expression { $$ = $1; }
@@ -726,6 +849,7 @@ logical_factor : NOT_OP logical_factor
 
 relation_expression : arithmetic_expression relation_operator arithmetic_expression
                     {
+                        codegen_Relation($1, $2, $3);
                         checkRelOp( $1, $2, $3 );
                         $$ = $1;
                     }
@@ -740,33 +864,41 @@ relation_operator : LT_OP { $$ = LT_t; }
                   | NE_OP { $$ = NE_t; }
                   ;
 
-arithmetic_expression : arithmetic_expression ADD_OP term
+arithmetic_expression : arithmetic_expression ADD_OP { codegen_ExprIns(); } term
                         {
-                            checkArithmeticOp( $1, ADD_t, $3 );
+                            codegen_Arithmetic($1, ADD_t, $4);
+                            checkArithmeticOp( $1, ADD_t, $4 );
+                            codegen_ExprIns();
                             $$ = $1;
                         }
-                      | arithmetic_expression SUB_OP term
+                      | arithmetic_expression SUB_OP { codegen_ExprIns(); } term
                         {
-                            checkArithmeticOp( $1, SUB_t, $3 );
+                            codegen_Arithmetic($1, SUB_t, $4);
+                            checkArithmeticOp( $1, SUB_t, $4 );
+                            codegen_ExprIns();
                             $$ = $1;
                         }
                       | relation_expression { $$ = $1; }
                       | term { $$ = $1; }
                       ;
 
-term : term MUL_OP factor
+term : term MUL_OP {codegen_ExprIns();} factor
         {
-            checkArithmeticOp( $1, MUL_t, $3 );
+            codegen_Arithmetic($1, MUL_t, $4);
+            checkArithmeticOp( $1, MUL_t, $4 );
             $$ = $1;
         }
-     | term DIV_OP factor
+     | term DIV_OP {codegen_ExprIns();} factor
         {
-            checkArithmeticOp( $1, DIV_t, $3 );
+            codegen_Arithmetic($1, DIV_t, $4);
+            checkArithmeticOp( $1, DIV_t, $4 );
             $$ = $1;
         }
-     | term MOD_OP factor 
+     | term MOD_OP {codegen_ExprIns();} factor 
         {
-            checkArithmeticOp( $1, MOD_t, $3 );
+            codegen_Arithmetic($1, MOD_t, $4);
+            checkArithmeticOp( $1, MOD_t, $4 );
+            $$ = $1;
         }
      |  factor { $$ = $1; }
      ;
@@ -774,14 +906,17 @@ term : term MUL_OP factor
 factor : variable_reference
         {
             checkExistence( symTable, $1, scope, false );
+            codegen_LoadVar($1);
             $$ = $1;
             $$->startOperator = NONE_t;
         }
        | SUB_OP variable_reference
         {
             if( checkExistence( symTable, $2, scope, false ) == true ) {
-                checkUnaryMinus( $2 );
+                checkUnaryMinus( $2);
             }
+            codegen_LoadVar($2);
+            codegen_Negative($2);
             $$ = $2;
             $$->startOperator = SUB_t;
         }
@@ -793,6 +928,7 @@ factor : variable_reference
        | SUB_OP L_PAREN logical_expression R_PAREN
         {
             checkUnaryMinus( $3 );
+            codegen_Negative($3);
             $$ = $3;
             $$->startOperator = SUB_t;
         }
@@ -800,21 +936,25 @@ factor : variable_reference
         {
             $$ = checkFuncInvoke( $1, $3, symTable, scope );
             $$->startOperator = NONE_t;
+            codegen_FunctionInvoke($1, false);
         }
        | SUB_OP ID L_PAREN logical_expression_list R_PAREN
         {
             $$ = checkFuncInvoke( $2, $4, symTable, scope );
             $$->startOperator = SUB_t;
+            codegen_FunctionInvoke($2, true);
         }
        | ID L_PAREN R_PAREN
         {
             $$ = checkFuncInvoke( $1, 0, symTable, scope );
             $$->startOperator = NONE_t;
+            codegen_FunctionInvoke($1, false);
         }
        | SUB_OP ID L_PAREN R_PAREN
         {
             $$ = checkFuncInvoke( $2, 0, symTable, scope );
             $$->startOperator = SUB_OP;
+            codegen_FunctionInvoke($2, true);
         }
        | literal_const
         {
@@ -829,7 +969,8 @@ factor : variable_reference
               else {
                 $$->startOperator = NONE_t;
               }
-              codegen_ConstLiteral($1);
+              if(save) nextNumber++;
+              codegen_ConstLiteral($1, save, nextNumber);
         }
        ;
 

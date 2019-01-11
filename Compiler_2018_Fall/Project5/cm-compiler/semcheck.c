@@ -9,6 +9,7 @@ bool checkCoercion(BTYPE decl, BTYPE def) {
     // define type should follow declared type
     // For coercion: double > float > int
     // printf("Line: %d Master: %d\tSlave: %d\n", linenum, decl, def);
+    if (decl == def) return true;
     if (decl == DOUBLE_t && (def == INTEGER_t || def == FLOAT_t)) return true;
     if (decl == FLOAT_t && def == INTEGER_t) return true;
     // other types coercion are not allowed
@@ -199,7 +200,7 @@ bool checkVarInitValue(ExtType *scalar, VarDecl *var, SymTable *table,
                 }
             }
             if (var->expr->extType->type != scalar->type) {
-                if (checkCoercion(var->expr->extType->type, scalar->type) ==
+                if (checkCoercion(scalar->type, var->expr->extType->type) ==
                     false) {
                     printError(InitVarTypeErr);
                     return false;

@@ -163,6 +163,7 @@ typedef struct SYMNODE {
 
     bool declAndDefined;
     bool isFuncDefine;
+    int varNumber;  // for code generation, variable
 } SymNode;
 
 typedef struct SYMTABLE {

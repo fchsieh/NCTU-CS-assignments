@@ -3,6 +3,7 @@
 
 #include <stdbool.h>
 #include "datatype.h"
+extern int varNumber;
 
 // ============= Build SymTable =============
 SymTable *initSymTab();
@@ -21,7 +22,7 @@ void printSymTable(SymTable *table, int scope);
 
 // ============= Create SymNodes  =============
 SymNode *createNode(char *name, int scope, ExtType *scalarType, KIND kind,
-                    void *attr);
+                    void *attr, int varNumber);
 ConstAttr *createConstantAttribute(BTYPE type, void *value);
 constParam *createConstParam(ConstAttr *constNode, char *id);
 ParamSemantic *createParam(IDNodeSemantic *ids, ExtType *extType);
