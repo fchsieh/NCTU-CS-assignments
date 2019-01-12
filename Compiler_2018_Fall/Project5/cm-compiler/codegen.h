@@ -39,7 +39,6 @@ void codegen_GenToList(char *fmt, ...);
 void codegen_InitProgram();
 
 // ===== Function =====
-bool checkQ();
 // function definition
 void codegen_BuildMainFunction();
 void codegen_BuildOtherFunction(char *id, ParamSemantic *param,
@@ -54,7 +53,7 @@ void codegen_FunctionReturn(ExtType *retType);  // returning a function
 // ===== Simple statement =====
 void codegen_PrintStart();
 void codegen_PrintEnd(ExprSemantic *expr);
-void codegen_ConstLiteral(ConstAttr *constAttr, bool save, int varNo);
+void codegen_ConstLiteral(ConstAttr *constAttr);
 void codegen_Read(ExprSemantic *expr);
 // ============================
 
@@ -110,4 +109,23 @@ struct valQueue *initValQueue();
 void valEnQ(struct valQueue *q, double val, BTYPE type);
 struct valNode *valDeq(struct valQueue *q);
 // ===============
+
+// ===== For Local Var =====
+struct localNode {
+    char *id;
+    BTYPE type;
+    int varNo;
+};
+
+struct localStack {
+    int top;
+    struct localNode **stack;
+};
+
+struct localNode *localNewNode(char *id, BTYPE type, int varNo);
+struct localStack *initLocalStack();
+void localPush(struct localStack *stack, char *id, BTYPE type, int varNo);
+struct localNode *locPop(struct localStack *stack);
+bool stackIsEmpty(struct localStack *stack);
+// =========================
 #endif

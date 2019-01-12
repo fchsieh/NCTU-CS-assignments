@@ -21,7 +21,7 @@ char *filename;
 // global var q's
 struct idQueue *idq;
 struct valQueue *valq;
-// struct realQueue *realq;
+struct localStack *locals;
 
 int main(int argc, char **argv) {
     if (argc == 1) {
@@ -42,6 +42,7 @@ int main(int argc, char **argv) {
     }
     idq = initIDQueue();
     valq = initValQueue();
+    locals = initLocalStack();
     symTable = initSymTab();  // create symbol table
     yyparse();                // main procedure
 

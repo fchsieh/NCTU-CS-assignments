@@ -31,11 +31,6 @@ void codegen_InitProgram() {
 }
 
 // ===== Function =====
-bool checkQ() {
-    // create a duplicate q for checking
-    if (dQ_empty && iQ_empty) return false;
-    return true;
-}
 // function definition
 void codegen_BuildMainFunction() {
     // main function
@@ -266,8 +261,8 @@ void codegen_PrintEnd(ExprSemantic *expr) {
     fprintf(output, ";    ### End of print ###\n\n");
 }
 
-void codegen_ConstLiteral(ConstAttr *constAttr, bool save, int varNo) {
-    char tmp[20];
+void codegen_ConstLiteral(ConstAttr *constAttr) {
+    char tmp[100];
     switch (constAttr->type) {
         case STRING_t:
             snprintf(insBuf, sizeof(insBuf), "ldc \"%s\"\n",
@@ -277,10 +272,6 @@ void codegen_ConstLiteral(ConstAttr *constAttr, bool save, int varNo) {
             if (scope != 0) {
                 snprintf(insBuf, sizeof(insBuf), "ldc %d ; is integer\n",
                          constAttr->value.integerVal);
-                if (save) {
-                    snprintf(tmp, sizeof(tmp), "istore %d\n", varNo);
-                    strcat(insBuf, tmp);
-                }
             } else {
                 valEnQ(valq, constAttr->value.integerVal, INTEGER_t);
             }
@@ -289,10 +280,6 @@ void codegen_ConstLiteral(ConstAttr *constAttr, bool save, int varNo) {
             if (scope != 0) {
                 snprintf(insBuf, sizeof(insBuf), "ldc %lf ; is float \n",
                          constAttr->value.floatVal);
-                if (save) {
-                    snprintf(tmp, sizeof(tmp), "fstore %d\n", varNo);
-                    strcat(insBuf, tmp);
-                }
             } else {
                 valEnQ(valq, constAttr->value.floatVal, FLOAT_t);
             }
@@ -301,10 +288,6 @@ void codegen_ConstLiteral(ConstAttr *constAttr, bool save, int varNo) {
             if (scope != 0) {
                 snprintf(insBuf, sizeof(insBuf), "ldc %lf ; is double \n",
                          constAttr->value.doubleVal);
-                if (save) {
-                    snprintf(tmp, sizeof(tmp), "fstore %d\n", varNo);
-                    strcat(insBuf, tmp);
-                }
             } else {
                 valEnQ(valq, constAttr->value.doubleVal, DOUBLE_t);
             }
@@ -313,10 +296,6 @@ void codegen_ConstLiteral(ConstAttr *constAttr, bool save, int varNo) {
             if (scope != 0) {
                 snprintf(insBuf, sizeof(insBuf), "iconst_%d ; is bool\n",
                          constAttr->value.booleanVal);
-                if (save) {
-                    snprintf(tmp, sizeof(tmp), "istore %d\n", varNo);
-                    strcat(insBuf, tmp);
-                }
             } else {
                 valEnQ(valq, constAttr->value.booleanVal, BOOLEAN_t);
             }
@@ -338,7 +317,7 @@ void codegen_Read(ExprSemantic *expr) {
                     case INTEGER_t:
                         fprintf(output,
                                 "invokevirtual java/util/Scanner/nextInt()I\n");
-                        fprintf(output, "putstatic %s %s I\n", filename,
+                        fprintf(output, "putstatic %s/%s I\n", filename,
                                 node->name);
                         break;
                     case FLOAT_t:
@@ -346,7 +325,7 @@ void codegen_Read(ExprSemantic *expr) {
                         fprintf(output,
                                 "invokevirtual "
                                 "java/util/Scanner/nextFloat()F\n");
-                        fprintf(output, "putstatic %s %s F\n", filename,
+                        fprintf(output, "putstatic %s/%s F\n", filename,
                                 node->name);
                         break;
                     case BOOLEAN_t:
@@ -728,4 +707,36 @@ struct valNode *valDeq(struct valQueue *q) {
     if (q->front == NULL) q->rear = NULL;
     return tmp;
 }
+// ================
+// ===== For Local Var =====
+struct localNode *localNewNode(char *id, BTYPE type, int varNo) {
+    struct localNode *tmp =
+        (struct localNode *)malloc(sizeof(struct localNode));
+    tmp->id = malloc(sizeof(char) * (strlen(id) + 1));
+    memset(tmp->id, 0, sizeof(tmp->id));
+    strcpy(tmp->id, id);
+    tmp->type = type;
+    tmp->varNo = varNo;
+    return tmp;
+}
+
+struct localStack *initLocalStack() {
+    struct localStack *stack =
+        (struct localStack *)malloc(sizeof(struct localStack));
+    stack->top = -1;
+    stack->stack = (struct localNode **)malloc(sizeof(struct localNode) * 50);
+    return stack;
+}
+
+void localPush(struct localStack *stack, char *id, BTYPE type, int varNo) {
+    stack->stack[++stack->top] = localNewNode(id, type, varNo);
+}
+
+struct localNode *locPop(struct localStack *stack) {
+    if (stackIsEmpty(stack)) return NULL;
+    return stack->stack[stack->top--];
+}
+
+bool stackIsEmpty(struct localStack *stack) { return stack->top == -1; }
+// =========================
 // ================================

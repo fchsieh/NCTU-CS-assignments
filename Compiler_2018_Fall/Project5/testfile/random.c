@@ -1,5 +1,5 @@
 int mySeed;
-int INITIALIZE = 123456789;
+int INITIALIZE = 755;
 
 void srand(int seed);
 int rand();
