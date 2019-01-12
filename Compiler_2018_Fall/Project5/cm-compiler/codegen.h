@@ -15,6 +15,7 @@ extern struct insList insList;
 extern int globalCount;
 extern struct idQueue *idq;
 extern struct valQueue *valq;
+extern bool globalConvertList[100];
 
 struct insList {
     char *list[2048];
@@ -82,6 +83,7 @@ void codegen_Relation(ExprSemantic *op1, OPERATOR op, ExprSemantic *op2);
 struct idNode {
     char *data;
     bool hasVal;
+    BTYPE type;
     struct idNode *next;
 };
 
@@ -89,10 +91,11 @@ struct idQueue {
     struct idNode *front, *rear;
 };
 
-struct idNode *idNewNode(char *id, bool hasVal);
+struct idNode *idNewNode(char *id, bool hasVal, BTYPE type);
 struct idQueue *initIDQueue();
-void idEnQ(struct idQueue *q, char *id, bool hasVal);
+void idEnQ(struct idQueue *q, char *id, bool hasVal, BTYPE type);
 struct idNode *idDeq(struct idQueue *q);
+struct idNode *searchIDQueue(struct idQueue *q, char *id);
 
 struct valNode {
     double val;
@@ -127,5 +130,7 @@ struct localStack *initLocalStack();
 void localPush(struct localStack *stack, char *id, BTYPE type, int varNo);
 struct localNode *locPop(struct localStack *stack);
 bool stackIsEmpty(struct localStack *stack);
+struct localNode *searchLocStack(struct localStack *stack, char *id);
+
 // =========================
 #endif

@@ -5,8 +5,6 @@
 
 struct loop_stack loopStack;
 int label_count = -1;
-bool iQ_empty = false;
-bool dQ_empty = false;
 
 void codegen_PushIns(char *instr) {
     insList.list[insList.size++] = strdup(instr);
@@ -14,11 +12,11 @@ void codegen_PushIns(char *instr) {
 
 void codegen_GenToList(char *fmt, ...) {
     char tmp[256];
-
-    va_list para;
-    va_start(para, fmt);
-    vsnprintf(tmp, sizeof(tmp), fmt, para);
-    va_end(para);
+    memset(tmp, 0, sizeof(tmp));
+    va_list args;
+    va_start(args, fmt);
+    vsnprintf(tmp, sizeof(tmp), fmt, args);
+    va_end(args);
     codegen_PushIns(tmp);
 }
 
@@ -46,6 +44,8 @@ void codegen_BuildMainFunction() {
         "\tinvokespecial java/util/Scanner/<init>(Ljava/io/InputStream;)V\n");
     fprintf(output, "\tputstatic %s/_sc Ljava/util/Scanner;\n", filename);
     fprintf(output, "; === assign global variable's value ===\n");
+    int count = 0;
+    int top = 0;
     while (1) {
         struct idNode *idn = idDeq(idq);
         if (idn == NULL) {
@@ -67,20 +67,26 @@ void codegen_BuildMainFunction() {
                         fprintf(output, "iconst_%d\n", (int)val->val);
                         break;
                 }
-                fprintf(output, "putstatic %s/%s ", filename, idn->data);
-                switch (val->type) {
-                    case INTEGER_t:
-                        fprintf(output, "I\n");
-                        break;
-                    case DOUBLE_t:
-                    case FLOAT_t:
-                        fprintf(output, "F\n");
-                        break;
-                    case BOOLEAN_t:
-                        fprintf(output, "Z\n");
-                        break;
+                if (globalConvertList[top]) {
+                    fprintf(output, "i2f\nputstatic %s/%s F\n", filename,
+                            idn->data);
+                } else {
+                    fprintf(output, "putstatic %s/%s ", filename, idn->data);
+                    switch (val->type) {
+                        case INTEGER_t:
+                            fprintf(output, "I\n");
+                            break;
+                        case DOUBLE_t:
+                        case FLOAT_t:
+                            fprintf(output, "F\n");
+                            break;
+                        case BOOLEAN_t:
+                            fprintf(output, "Z\n");
+                            break;
+                    }
                 }
             }
+            top++;
         }
     }
     fprintf(output, "; ======================================\n");
@@ -329,9 +335,9 @@ void codegen_Read(ExprSemantic *expr) {
                                 node->name);
                         break;
                     case BOOLEAN_t:
-                        fprintf(
-                            output,
-                            "invokevirtual java/util/Scanner/nextBoolean()Z\n");
+                        fprintf(output,
+                                "invokevirtual "
+                                "java/util/Scanner/nextBoolean()Z\n");
                         fprintf(output, "putstatic %s %s Z\n", filename,
                                 node->name);
                         break;
@@ -387,9 +393,8 @@ void codegen_GlobalVar(VarDecl *ptr, ExtType *type) {
                      name);
             break;
     }
-    codegen_PushIns(insBuf);
+    fprintf(output, "%s", insBuf);
     memset(insBuf, 0, sizeof(insBuf));
-    codegen_ExprIns();
 }
 
 void codegen_ExprIns() {
@@ -458,42 +463,79 @@ void codegen_SaveExpr(ExprSemantic *expr, ExprSemantic *right) {
     memset(insBuf, 0, sizeof(insBuf));  // clear codes
 }
 
-void lookupVar(SymTable *symTable, char *name, int scope) {}
-
-void codegen_Negative() {}
+void codegen_Negative(ExprSemantic *expr) {
+    switch (expr->extType->type) {
+        case INTEGER_t:
+            codegen_GenToList("ineg\n");
+            break;
+        case FLOAT_t:
+        case DOUBLE_t:
+            codegen_GenToList("fneg\n");
+            break;
+    }
+}
 
 void codegen_LoadVar(ExprSemantic *var) {
     if (var && var->varRef) {
         SymNode *node = lookupSymbol(symTable, var->varRef->id, scope, false);
-        if (node && node->scope != 0) {
-            switch (node->type->type) {
-                case INTEGER_t:
-                case BOOLEAN_t:
-                    snprintf(insBuf, sizeof(insBuf),
-                             "iload %d ; var name: %s\n", node->varNumber,
-                             node->name);
-                    break;
-                case FLOAT_t:
-                case DOUBLE_t:
-                    snprintf(insBuf, sizeof(insBuf),
-                             "fload %d ; var name: %s\n", node->varNumber,
-                             node->name);
-                    break;
+        if (node && node->kind != CONSTANT_t) {  // variable type
+            if (node->scope != 0) {
+                switch (node->type->type) {
+                    case INTEGER_t:
+                    case BOOLEAN_t:
+                        snprintf(insBuf, sizeof(insBuf),
+                                 "iload %d ; var name: %s\n", node->varNumber,
+                                 node->name);
+                        break;
+                    case FLOAT_t:
+                    case DOUBLE_t:
+                        snprintf(insBuf, sizeof(insBuf),
+                                 "fload %d ; var name: %s\n", node->varNumber,
+                                 node->name);
+                        break;
+                }
+            } else if (node->scope == 0) {
+                switch (node->type->type) {
+                    case INTEGER_t:
+                        snprintf(insBuf, sizeof(insBuf), "getstatic %s/%s I\n",
+                                 filename, node->name);
+                        break;
+                    case BOOLEAN_t:
+                        snprintf(insBuf, sizeof(insBuf), "getstatic %s/%s Z\n",
+                                 filename, node->name);
+                        break;
+                    case FLOAT_t:
+                    case DOUBLE_t:
+                        snprintf(insBuf, sizeof(insBuf), "getstatic %s/%s F\n",
+                                 filename, node->name);
+                        break;
+                }
             }
-        } else if (node && node->scope == 0) {
-            switch (node->type->type) {
-                case INTEGER_t:
-                    snprintf(insBuf, sizeof(insBuf), "getstatic %s/%s I\n",
-                             filename, node->name);
-                    break;
+        } else if (node &&
+                   node->kind == CONSTANT_t) {  // constant, load from symtable
+            switch (node->attribute->constVal->type) {
                 case BOOLEAN_t:
-                    snprintf(insBuf, sizeof(insBuf), "getstatic %s/%s Z\n",
-                             filename, node->name);
+                    snprintf(insBuf, sizeof(insBuf), "ldc %d\n",
+                             node->attribute->constVal->value.booleanVal);
                     break;
-                case FLOAT_t:
+                case INTEGER_t:
+
+                    if (node->type->type != INTEGER_t) {
+                        snprintf(insBuf, sizeof(insBuf), "ldc %d\ni2f\n",
+                                 node->attribute->constVal->value.integerVal);
+                    } else {
+                        snprintf(insBuf, sizeof(insBuf), "ldc %d\n",
+                                 node->attribute->constVal->value.integerVal);
+                    }
+                    break;
                 case DOUBLE_t:
-                    snprintf(insBuf, sizeof(insBuf), "getstatic %s/%s F\n",
-                             filename, node->name);
+                case FLOAT_t:
+                    snprintf(insBuf, sizeof(insBuf), "ldc %lf\n",
+                             node->attribute->constVal->value.floatVal);
+                    break;
+                case STRING_t:
+                    snprintf(insBuf, sizeof(insBuf), "ldc \"%s\"\n",
+                             node->attribute->constVal->value.stringVal);
                     break;
             }
         }
@@ -641,12 +683,13 @@ void codegen_Relation(ExprSemantic *op1, OPERATOR op, ExprSemantic *op2) {
 
 // ===== For global Var queue =====
 // ===== ID Q =====
-struct idNode *idNewNode(char *id, bool hasVal) {
+struct idNode *idNewNode(char *id, bool hasVal, BTYPE type) {
     struct idNode *tmp = (struct idNode *)malloc(sizeof(struct idNode));
     tmp->data = (char *)malloc(sizeof(char) * 50);
-    memset(tmp->data, 0, sizeof(tmp->data));
+    // memset(tmp->data, 0, sizeof(tmp->data));
     strcpy(tmp->data, id);
     tmp->hasVal = hasVal;
+    tmp->type = type;
     tmp->next = NULL;
     return tmp;
 }
@@ -657,8 +700,8 @@ struct idQueue *initIDQueue() {
     return q;
 }
 
-void idEnQ(struct idQueue *q, char *id, bool hasVal) {
-    struct idNode *tmp = idNewNode(id, hasVal);
+void idEnQ(struct idQueue *q, char *id, bool hasVal, BTYPE type) {
+    struct idNode *tmp = idNewNode(id, hasVal, type);
     if (q->rear == NULL) {
         q->front = q->rear = tmp;
         return;
@@ -673,6 +716,17 @@ struct idNode *idDeq(struct idQueue *q) {
     q->front = q->front->next;
     if (q->front == NULL) q->rear = NULL;
     return tmp;
+}
+
+struct idNode *searchIDQueue(struct idQueue *q, char *id) {
+    struct idNode *ptr = q->front;
+    while (ptr != NULL) {
+        if (strcmp(ptr->data, id) == 0) {
+            return ptr;
+        }
+        ptr = ptr->next;
+    }
+    return NULL;
 }
 // ================
 // ===== VALUE Q =====
@@ -712,8 +766,8 @@ struct valNode *valDeq(struct valQueue *q) {
 struct localNode *localNewNode(char *id, BTYPE type, int varNo) {
     struct localNode *tmp =
         (struct localNode *)malloc(sizeof(struct localNode));
-    tmp->id = malloc(sizeof(char) * (strlen(id) + 1));
-    memset(tmp->id, 0, sizeof(tmp->id));
+    tmp->id = malloc(sizeof(char) * (50));
+    // memset(tmp->id, 0, sizeof(tmp->id));
     strcpy(tmp->id, id);
     tmp->type = type;
     tmp->varNo = varNo;
@@ -738,5 +792,16 @@ struct localNode *locPop(struct localStack *stack) {
 }
 
 bool stackIsEmpty(struct localStack *stack) { return stack->top == -1; }
-// =========================
+
+struct localNode *searchLocStack(struct localStack *stack, char *id) {
+    int top = stack->top;
+    struct localNode *head = stack->stack[top];
+    while (top != -1) {
+        if (strcmp(stack->stack[top]->id, id) == 0) {
+            return stack->stack[top];
+        }
+        top--;
+    }
+    return NULL;
+}
 // ================================

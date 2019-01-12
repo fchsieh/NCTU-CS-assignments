@@ -12,7 +12,6 @@ extern FILE *yyin;
 
 extern SymTable *symTable;
 extern ExtType *funcReturn;
-
 extern bool semError;
 
 FILE *output;
@@ -22,6 +21,7 @@ char *filename;
 struct idQueue *idq;
 struct valQueue *valq;
 struct localStack *locals;
+bool globalConvertList[100];
 
 int main(int argc, char **argv) {
     if (argc == 1) {
@@ -40,9 +40,14 @@ int main(int argc, char **argv) {
         fprintf(stderr, "Usage: ./parser [filename]\n");
         exit(0);
     }
+    // initializations
     idq = initIDQueue();
     valq = initValQueue();
     locals = initLocalStack();
+    for (int i = 0; i < 100; i++) {
+        globalConvertList[i] = false;
+    }
+
     symTable = initSymTab();  // create symbol table
     yyparse();                // main procedure
 

@@ -41,6 +41,10 @@ extern struct valQueue *valq;
 // local var
 extern struct localStack *locals;
 int varDeclNum = 1;
+bool needconvert = false;
+extern bool globalConvertList[100];
+int gListTop = 0;
+
 %}
 
 %union {
@@ -401,8 +405,6 @@ parameter_list : parameter_list COMMA scalar_type ID
 var_decl : scalar_type identifier_list SEMICOLON
             {
                 VarDecl *ptr = $2;
-                // fprintf(output, "; var_decl\n"); //start var declaration(line)
-                // fprintf(output, "; var_decl, no: %d\n", varNumber+1);
                 if(scope != 0) varDeclNum = varNumber;
                 while( ptr != NULL ){
                     if( checkRedeclaration( symTable, ptr->para->idlist->value, scope ) == false ) { }
@@ -412,13 +414,27 @@ var_decl : scalar_type identifier_list SEMICOLON
                             if(scope == 0) { // is global variable
                                 newNode = createNode( ptr->para->idlist->value, scope, ptr->para->extType, VARIABLE_t, 0, 0 );
                                 codegen_GlobalVar(ptr, $1);
-                                // fprintf(output , "; name: %s\n", ptr->para->idlist->value);
                                 globalCount++;
+                                struct idNode *findidn = searchIDQueue(idq, ptr->para->idlist->value);
+                                if(findidn != NULL) {
+                                    if(findidn->type == INTEGER_t && ptr->para->extType->type != INTEGER_t) {
+                                        globalConvertList[gListTop++] = true;
+                                    }
+                                    else
+                                        gListTop++;
+                                }
                             }
                             else {  // local variable
                                 newNode = createNode( ptr->para->idlist->value, scope, ptr->para->extType, VARIABLE_t, 0, varNumber++);
+                                struct localNode *findn = searchLocStack(locals, ptr->para->idlist->value);
+                                if(findn != NULL){
+                                    if(findn->type == INTEGER_t && ptr->para->extType->type != INTEGER_t){
+                                        // fprintf(output, "; \t%s, %d\n", findn->id, findn->type);
+                                        needconvert = true;
+                                    }
+                                }
                             }
-                            insertIntoSymTable( symTable, newNode );;
+                            insertIntoSymTable( symTable, newNode );
                         }
                     }
                     ptr = ptr->next;
@@ -433,28 +449,24 @@ identifier_list : identifier_list COMMA ID
                     concateParam("VarDecl", $1, vptr );
                     $$ = $1;
                     if(scope == 0)
-                        idEnQ(idq, $3, false);
+                        idEnQ(idq, $3, false, NONE_t);
                     else {
                         varDeclNum++;
                     }
                 }
-                | identifier_list COMMA ID ASSIGN_OP
-                {
-                    if(scope == 0)
-                        idEnQ(idq, $3, true);
-                }
-                logical_expression
+                | identifier_list COMMA ID ASSIGN_OP logical_expression
                 {
                     ParamSemantic *ptr = createParam( createIdList( $3 ), createExtType( VOID_t ) );
-                    VarDecl *vptr = createVarDecl( ptr, $6 );
+                    VarDecl *vptr = createVarDecl( ptr, $5 );
                     vptr->isArray = true;
                     vptr->isInit = true;
                     concateParam("VarDecl", $1, vptr );
                     $$ = $1;
-                    // codegen_ExprIns();
-                    // fprintf(output, "; hasval: %s, type: %d, varno: %d\n", $3, $6->extType->type, varNumber);
+                    if(scope == 0)
+                        idEnQ(idq, $3, true, $5->extType->type);
                     if(scope != 0) {
-                        localPush(locals, $3, $6->extType->type, varDeclNum++);
+                        localPush(locals, $3, $5->extType->type, varDeclNum++);
+                        // codegen_GenToList("; id: %s, type: %d\n", $3, $6->extType->type);
                     }
                 }
                 | identifier_list COMMA array_decl ASSIGN_OP initial_array
@@ -493,19 +505,16 @@ identifier_list : identifier_list COMMA ID
                     $$ = createVarDecl( ptr, $3 );
                     $$->isInit = true;
                     if(scope == 0)
-                        idEnQ(idq, $1, true);
-                    
-                    // fprintf(output, "; hasval: %s, type: %d, varno: %d\n", $1, $3->extType->type, varNumber);
-                    else {
+                        idEnQ(idq, $1, true, $3->extType->type);
+                    else
                         localPush(locals, $1, $3->extType->type, varDeclNum++);
-                    }
                 }
                 | ID
                 {
                     ParamSemantic *ptr = createParam( createIdList( $1 ), createExtType( VOID_t ) );
                     $$ = createVarDecl( ptr, 0 );
                     if(scope == 0)
-                        idEnQ(idq, $1, false);
+                        idEnQ(idq, $1, false, NONE_t);
                     else {
                         varDeclNum++;
                     }
@@ -612,15 +621,17 @@ compound_statement : {scope++;}L_BRACE var_const_stmt_list R_BRACE
 var_const_stmt_list : var_const_stmt_list statement
                     | var_const_stmt_list var_decl
                     {
-                        // use gentolist here
-                        // fprintf(output, "; end of var decl, varno: %d\n", varNumber);
-                        while(1){
+                        while(1) {
+                            if(scope == 0) break;
                             struct localNode *localn = locPop(locals);
                             if(localn == NULL) break;
                             switch(localn->type){
                                 case INTEGER_t:
                                 case BOOLEAN_t:
-                                    codegen_GenToList("istore %d\n", localn->varNo-1);
+                                    if(needconvert)
+                                        codegen_GenToList("istore %d ; need convert\niload %d\ni2f\nfstore %d\n", localn->varNo-1, localn->varNo-1, localn->varNo-1);
+                                    else 
+                                        codegen_GenToList("istore %d\n", localn->varNo-1);
                                     break;
                                 case DOUBLE_t:
                                 case FLOAT_t:
@@ -630,9 +641,10 @@ var_const_stmt_list : var_const_stmt_list statement
                         }
                         locals = initLocalStack();
                         varDeclNum = varNumber+1;
+                        needconvert = false;
                     }
                     | var_const_stmt_list const_decl
-                    |
+                    | {varDeclNum = varNumber+1;}
                     ;
 
 statement : compound_statement

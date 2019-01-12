@@ -1,24 +1,20 @@
 int mySeed;
-int INITIALIZE = 755;
+const int INITIALIZE = 123456789;
 
 void srand(int seed);
 int rand();
 
 int main() {
-    int i, grade;
-    i = 1;
+    int i = 1, grade;
 
     srand(INITIALIZE);  // print "student (number)    (grade)    pass/fail"
 
     // print "student (number)    (grade)    pass/fail"
-    while (i <= 15) {
+    while (i <= 10) {
         print "student ";
         print i;
         print "\t";
         grade = rand() % 71 + 30;
-        if (grade <= 0) {
-            grade = grade + 100;
-        }
         print grade;
         print "\t";
 
@@ -29,6 +25,7 @@ int main() {
         else {
             print "fail\n";
         }
+
         i = i + 1;
     }
 
@@ -38,7 +35,8 @@ int main() {
 void srand(int seed) { mySeed = seed; }
 
 int rand() {
-    mySeed = mySeed * 234 + 456;
+    mySeed = mySeed * 234 + 123;
+
     if (mySeed >= 0) {
         return mySeed;
     }

@@ -2,50 +2,50 @@ int intvalue;
 float floatvalue;
 
 int main() {
-	int integer_a, integer_b, integer_c;
-	bool bool_d;
-	float float_e, float_f;
+	int a, b, c;
+	bool d;
+	float e, f;
 	
 	// read 3 integer and 2 float
-	read integer_a;
-	read integer_b;
-	read integer_c;
-	read float_e;
-	read float_f;
+	read a;
+	read b;
+	read c;
+	read e;
+	read f;
 	
 	print "--------------------\n";
 	
-	print integer_c;
+	print c;
 	print " ";
-	print integer_a;
+	print a;
 	print " ";
-	print integer_b;
+	print b;
 	print " ";
-	print float_e;
+	print e;
 	print " ";
-	print float_f;
+	print f;
 	print "\n";
 	
-	// swap integer_b and integer_c, take intvalue as temp storage
-	intvalue = integer_b;
-	integer_b = integer_c;
-	integer_c = intvalue;
-	print integer_b;
+	// swap b and c, take intvalue as temp storage
+	intvalue = b;
+	b = c;
+	c = intvalue;
+	print b;
 	print " ";
-	print integer_c;
+	print c;
 	print "\n";
 	
-	// swap float_e and float_f, take gr as temp storage
-	floatvalue = float_f;
-	float_f = float_e;
-	float_e = floatvalue;
-	print float_e;
+	// swap e and f, take gr as temp storage
+	floatvalue = f;
+	f = e;
+	e = floatvalue;
+	print e;
 	print " ";
-	print float_f;
+	print f;
 	print "\n";
 	
-	bool_d = true;
-	print bool_d;
+	d = true;
+	print d;
 	print "\n";
 
 	return 0;
