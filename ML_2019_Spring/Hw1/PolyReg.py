@@ -43,7 +43,7 @@ class PolyReg():
         tmp = mat.matrixMult(tmp, b)  # 2A^Tb
         res = mat.matrixSub(res, tmp)  # 2A^TAx - 2A^Tb
         return res
-    
+
     # public:
     def rLSE(self):
         x = []
