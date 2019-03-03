@@ -34,6 +34,16 @@ class PolyReg():
         for datarow in self.data:
             self.vecB.append([datarow[1]])
 
+    def __gradient(self, A, b, x):
+        res = mat.transpose(self.matA)  # A^T
+        res = mat.matrixScalar(2, res)  # 2A^T
+        res = mat.matrixMult(res, self.matA)  # 2A^TA
+        res = mat.matrixMult(res, x)  # 2A^TAx
+        tmp = mat.matrixScalar(2, mat.transpose(self.matA))  # 2A^T
+        tmp = mat.matrixMult(tmp, b)  # 2A^Tb
+        res = mat.matrixSub(res, tmp)  # 2A^TAx - 2A^Tb
+        return res
+    
     # public:
     def rLSE(self):
         x = []
@@ -55,16 +65,6 @@ class PolyReg():
         for datarow in self.data:
             error += math.pow(datarow[1] - polyLSE(datarow[0]), 2)
         return flat_x, error
-
-    def __gradient(self, A, b, x):
-        res = mat.transpose(self.matA)  # A^T
-        res = mat.matrixScalar(2, res)  # 2A^T
-        res = mat.matrixMult(res, self.matA)  # 2A^TA
-        res = mat.matrixMult(res, x)  # 2A^TAx
-        tmp = mat.matrixScalar(2, mat.transpose(self.matA))  # 2A^T
-        tmp = mat.matrixMult(tmp, b)  # 2A^Tb
-        res = mat.matrixSub(res, tmp)  # 2A^TAx - 2A^Tb
-        return res
 
     def Newton(self, iters=100):
         # Build Hessian^-1 = (2A^TA)^-1
