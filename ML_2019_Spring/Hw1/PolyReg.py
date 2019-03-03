@@ -71,7 +71,7 @@ class PolyReg():
         AT = mat.transpose(self.matA)
         Hessian = mat.matrixScalar(2, AT)
         Hessian = mat.matrixMult(Hessian, self.matA)
-        Hessian = mat.inverse(Hessian)
+        Hessian = mat.inverse(Hessian)  # Hf(x)^-1
         # init point (x0)
         x = []
         for _ in range(self.dim + 1):
