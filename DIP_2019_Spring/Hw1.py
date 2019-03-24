@@ -20,6 +20,9 @@ def reviseImage():
 
 
 def geoTransform():
+    """
+    (2) geometric transformations
+    """
     for fn in os.listdir("./part1"):
         path = "./part1/%s" % fn
         img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
@@ -33,6 +36,9 @@ def geoTransform():
 
 
 def addGaussianNoises():
+    """
+    (3) add 3 different noises
+    """
     img_names = [
         "1.jpeg", "2.jpeg", "3.jpeg", "dark.jpeg", "overexposure.jpeg"
     ]
@@ -51,13 +57,35 @@ def addGaussianNoises():
 
 
 def removeGaussianNoises():
+    """
+    (4) remove noises from part 3
+    """
     for fn in os.listdir("./part3"):
         path = "./part3/%s" % fn
         img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
         newimg = cv2.fastNlMeansDenoising(img, None, 10, 7, 21)
         cv2.imwrite("./part4/denoise_" + fn, newimg)
 
-# def 
+
+def luminanceAdjust():
+    """
+    (5) luminance adjustment of overexposured and dark image in (1)
+    """
+    filename = ["dark.jpeg", "overexposure.jpeg"]
+    for fn in filename:
+        path = "./part1/revised_" + fn
+        img = cv2.imread(path, cv2.IMREAD_UNCHANGED)
+        # 1. histogram equalize
+        newimg = cv2.equalizeHist(img)
+        cv2.imwrite("./part5/equHist_" + fn, newimg)
+        # 2. Gamma correction
+        gamma = 0.4
+        LUT = np.empty((1, 256), np.uint8)
+        for i in range(256):
+            LUT[0, i] = np.clip((i / 255.0)**gamma * 255.0, 0, 255)
+        newimg2 = cv2.LUT(img, LUT)
+        cv2.imwrite("./part5/gamma_" + fn, newimg2)
+
 
 def main():
     # part 1
@@ -69,6 +97,7 @@ def main():
     # part 4
     #removeGaussianNoises()
     # part 5
+    luminanceAdjust()
 
 
 if __name__ == "__main__":
