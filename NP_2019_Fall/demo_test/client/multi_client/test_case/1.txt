@@ -1,0 +1,20 @@
+1:noop
+2:noop
+1:printenv PATH
+1:setenv PATH .
+1:printenv PATH
+2:printenv PATH
+2:ls | number |2
+2:cat test.html |1
+1:ls
+1:number
+2:cat
+1:setenv PATH bin
+1:printenv PATH
+1:ls > ls.txt
+1:cat ls.txt
+2:removetag test.html | number
+1:number test.html | removetag
+1:exit
+2:exit
+exit

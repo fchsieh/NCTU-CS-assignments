@@ -1,0 +1,16 @@
+1:printenv PATH
+1:ls
+1:setenv PATH .
+1:printenv PATH
+1:ls
+1:setenv PATH bin:.
+1:ls
+1:ls bin
+1:setenv PATH mybin
+1:ls
+1:removetag test.html
+1:setenv PATH bin:mybin
+1:ls 
+1:removetag test.html
+1:exit
+exit

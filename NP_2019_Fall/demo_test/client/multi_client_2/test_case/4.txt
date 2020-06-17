@@ -1,0 +1,35 @@
+1:noop
+2:noop
+3:noop
+4:noop
+1:name Egglet
+2:name FruitBuffet
+3:name GingerCookies
+4:name HotCakes
+1:number test.html >2
+1:cat test.html >3
+1:cat test.html | cat >3
+1:cat test.html >6
+2:number <1
+2:cat test.html >3
+2:number <4
+3:number <2
+3:ls >4
+2:number test.html >5
+3:number <2
+4:removetag test.html >1
+4:number <3
+4:cat <3
+3:cat <1
+1:number <5
+1:exit
+5:noop
+5:name IceCream
+5:who
+5:cat <4
+5:number test.html >3
+2:exit
+3:exit
+4:exit
+5:exit
+exit

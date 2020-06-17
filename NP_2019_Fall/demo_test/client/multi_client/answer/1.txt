@@ -1,0 +1,56 @@
+1| ****************************************
+1| ** Welcome to the information server. **
+1| ****************************************
+1| *** User '(no name)' entered from [address1]. ***
+1| % noop
+2| ****************************************
+2| ** Welcome to the information server. **
+2| ****************************************
+2| *** User '(no name)' entered from [address2]. ***
+2| % noop
+1| % printenv PATH
+1| *** User '(no name)' entered from [address2]. ***
+1| bin:.
+1| % setenv PATH .
+1| % printenv PATH
+2| % printenv PATH
+2| bin:.
+2| % ls | number |2
+2| % cat test.html |1
+1| .
+1| % ls
+1| Unknown command: [ls].
+1| % number
+2| % cat
+1| Unknown command: [number].
+1| % setenv PATH bin
+1| % printenv PATH
+1| bin
+1| % ls > ls.txt
+1| % cat ls.txt
+2|    1 bin
+2|    2 test.html
+2|    3 user_pipe
+2| <!test.html>
+2| <TITLE>Test</TITLE>
+2| <BODY>This is a <b>test</b> program
+2| for ras.
+2| </BODY>
+2| % removetag test.html | number
+1| bin
+1| ls.txt
+1| test.html
+1| user_pipe
+1| % number test.html | removetag
+1|    1 
+1|    2 Test
+1|    3 This is a test program
+1|    4 for ras.
+1|    5 
+1| % exit
+2|    1 
+2|    2 Test
+2|    3 This is a test program
+2|    4 for ras.
+2|    5 
+2| % exit

@@ -1,47 +1,21 @@
-#include <stdio.h>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
-#include <string>
-#include <stdlib.h>
-#include <cstring>
-
-FILE *fd;
 using namespace std;
 
-int main(int argc, char *argv[])
-{
-  char c;
-  int counter = 1;
+int main(int argc, char* const argv[]) {
+  ifstream file;
+  if (argc == 2) {
+    file.open(argv[1]);
+    cin.rdbuf(file.rdbuf());
+  } else if (argc > 2) {
+    cerr << "usage: " << argv[0] << " [filename]" << endl;
+  }
 
-  if(argc == 1)
-     fd = stdin;
-  else if(argc == 2)
-     fd = fopen(argv[1], "r");
-  else
-  {
-     fprintf(stderr,"Usage");
-     exit(1);
+  string line;
+  int lineno = 0;
+  while (getline(cin, line)) {
+    cout << setw(4) << setfill(' ') << ++lineno << ' ' << line << endl;
   }
-  
-  string str="";
-  while((c = fgetc(fd))!=EOF)
-  {
-    if (c == -1)
-      break;
-    str+=c;
-    if (c == '\n'){
-      fprintf(stdout, "%4d %s", counter++, str.c_str());
-      str="";
-    }
-  } 
-  if( strcmp( str.c_str(), "") !=0 )
-  {
-      cout << "   " << counter++ << " " << str;
-      cout << endl;
-  }
-  fclose(fd);
   return 0;
-
 }
-
-
- 

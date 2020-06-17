@@ -1,0 +1,80 @@
+1| ****************************************
+1| ** Welcome to the information server. **
+1| ****************************************
+1| *** User '(no name)' entered from [address1]. ***
+1| % noop
+2| ****************************************
+2| ** Welcome to the information server. **
+2| ****************************************
+2| *** User '(no name)' entered from [address2]. ***
+2| % noop
+3| ****************************************
+3| ** Welcome to the information server. **
+3| ****************************************
+3| *** User '(no name)' entered from [address3]. ***
+3| % noop
+1| % name ApplePie
+2| % name BakedCake
+2| *** User '(no name)' entered from [address3]. ***
+2| *** User from [address1] is named 'ApplePie'. ***
+2| *** User from [address2] is named 'BakedCake'. ***
+2| % who
+1| *** User '(no name)' entered from [address2]. ***
+1| *** User '(no name)' entered from [address3]. ***
+1| *** User from [address1] is named 'ApplePie'. ***
+1| % exit
+3| % name Cream
+4| ****************************************
+4| ** Welcome to the information server. **
+4| ****************************************
+4| *** User '(no name)' entered from [address4]. ***
+4| % noop
+3| *** User from [address1] is named 'ApplePie'. ***
+3| *** User from [address2] is named 'BakedCake'. ***
+3| *** User 'ApplePie' left. ***
+3| *** User from [address3] is named 'Cream'. ***
+3| % who
+4| % name Donut
+2| <ID>	<nickname>	<IP:port>	<indicate me>
+2| 1	ApplePie	[address1]
+2| 2	BakedCake	[address2]	<-me
+2| 3	(no name)	[address3]
+2| % who
+2| *** User 'ApplePie' left. ***
+2| *** User from [address3] is named 'Cream'. ***
+2| *** User '(no name)' entered from [address4]. ***
+2| *** User from [address4] is named 'Donut'. ***
+2| <ID>	<nickname>	<IP:port>	<indicate me>
+2| 1	Donut	[address4]
+2| 2	BakedCake	[address2]	<-me
+2| 3	Cream	[address3]
+2| % yell I am hungry.
+3| *** User '(no name)' entered from [address4]. ***
+3| <ID>	<nickname>	<IP:port>	<indicate me>
+3| 1	(no name)	[address4]
+3| 2	BakedCake	[address2]
+3| 3	Cream	[address3]	<-me
+3| % yell Me too.
+2| *** BakedCake yelled ***: I am hungry.
+2| % tell 3 What do you want to eat? 
+2| *** Cream yelled ***: Me too.
+2| % tell 5 Donut?
+2| *** Error: user #5 does not exist yet. ***
+2| % tell 3 Donut?
+3| *** User from [address4] is named 'Donut'. ***
+3| *** BakedCake yelled ***: I am hungry.
+3| *** Cream yelled ***: Me too.
+3| % tell 2 Sound good.
+4| *** User from [address4] is named 'Donut'. ***
+4| % tell 2 Don't eat me.
+4| *** BakedCake yelled ***: I am hungry.
+4| *** Cream yelled ***: Me too.
+4| % yell ls > test1.html
+4| *** Donut yelled ***: ls > test1.html
+4| % tell 6 ls > test1.html
+2| % exit
+3| *** BakedCake told you ***: What do you want to eat? 
+3| *** BakedCake told you ***: Donut?
+3| % exit
+4| *** Error: user #6 does not exist yet. ***
+4| % exit

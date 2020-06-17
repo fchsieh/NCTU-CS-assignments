@@ -1,0 +1,22 @@
+1| ****************************************
+1| ** Welcome to the information server. **
+1| ****************************************
+1| *** User '(no name)' entered from [address1]. ***
+1| % noop
+2| ****************************************
+2| ** Welcome to the information server. **
+2| ****************************************
+2| *** User '(no name)' entered from [address2]. ***
+2| % noop
+3| ****************************************
+3| ** Welcome to the information server. **
+3| ****************************************
+3| *** User '(no name)' entered from [address3]. ***
+3| % noop
+4| ****************************************
+4| ** Welcome to the information server. **
+4| ****************************************
+4| *** User '(no name)' entered from [address4]. ***
+4| % noop
+1| % name Egglet
+2| % name FruitBuffet

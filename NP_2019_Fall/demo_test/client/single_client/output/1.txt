@@ -1,0 +1,40 @@
+1| % printenv PATH
+1| bin:.
+1| % ls
+1| bin
+1| test.html
+1| user_pipe
+1| % setenv PATH .
+1| % printenv PATH
+1| .
+1| % ls
+1| Unknown command: [ls].
+1| % setenv PATH bin:.
+1| % ls
+1| bin
+1| test.html
+1| user_pipe
+1| % ls bin
+1| cat
+1| ls
+1| noop
+1| number
+1| removetag
+1| removetag0
+1| % setenv PATH mybin
+1| % ls
+1| Unknown command: [ls].
+1| % removetag test.html
+1| Unknown command: [removetag].
+1| % setenv PATH bin:mybin
+1| % ls 
+1| bin
+1| test.html
+1| user_pipe
+1| % removetag test.html
+1| 
+1| Test
+1| This is a test program
+1| for ras.
+1| 
+1| % exit

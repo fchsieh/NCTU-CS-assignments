@@ -1,0 +1,252 @@
+1:noop
+2:noop
+3:noop
+4:noop
+5:noop
+6:noop
+7:noop
+8:noop
+9:noop
+10:noop
+11:noop
+12:noop
+13:noop
+14:noop
+15:noop
+16:noop
+17:noop
+18:noop
+19:noop
+20:noop
+21:noop
+22:noop
+23:noop
+24:noop
+25:noop
+26:noop
+27:noop
+28:noop
+29:noop
+30:noop
+8:exit
+13:exit
+30:exit
+26:exit
+21:exit
+31:noop
+32:noop
+33:noop
+34:noop
+31:exit
+32:exit
+34:exit
+33:exit
+24:exit
+2:exit
+4:exit
+10:exit
+7:exit
+35:noop
+36:noop
+37:noop
+38:noop
+39:noop
+40:noop
+41:noop
+42:noop
+38:exit
+40:exit
+41:exit
+42:exit
+35:exit
+36:exit
+39:exit
+37:exit
+19:exit
+5:exit
+27:exit
+9:exit
+17:exit
+12:exit
+14:exit
+29:exit
+15:exit
+3:exit
+18:exit
+25:exit
+43:noop
+44:noop
+45:noop
+46:noop
+47:noop
+48:noop
+49:noop
+50:noop
+51:noop
+52:noop
+53:noop
+54:noop
+55:noop
+56:noop
+57:noop
+58:noop
+59:noop
+60:noop
+61:noop
+62:noop
+63:noop
+64:noop
+48:exit
+52:exit
+64:exit
+61:exit
+58:exit
+59:exit
+43:exit
+45:exit
+50:exit
+47:exit
+57:exit
+46:exit
+62:exit
+49:exit
+55:exit
+51:exit
+53:exit
+63:exit
+54:exit
+44:exit
+65:noop
+66:noop
+67:noop
+68:noop
+69:noop
+70:noop
+71:noop
+72:noop
+73:noop
+74:noop
+75:noop
+76:noop
+77:noop
+78:noop
+79:noop
+80:noop
+81:noop
+82:noop
+83:noop
+84:noop
+70:exit
+74:exit
+84:exit
+81:exit
+79:exit
+80:exit
+65:exit
+67:exit
+72:exit
+69:exit
+78:exit
+68:exit
+82:exit
+71:exit
+77:exit
+73:exit
+75:exit
+83:exit
+76:exit
+66:exit
+56:exit
+60:exit
+20:exit
+1:exit
+28:exit
+16:exit
+23:exit
+6:exit
+11:exit
+85:noop
+86:noop
+87:noop
+88:noop
+89:noop
+90:noop
+91:noop
+92:noop
+93:noop
+94:noop
+95:noop
+96:noop
+97:noop
+98:noop
+99:noop
+100:noop
+101:noop
+102:noop
+103:noop
+104:noop
+105:noop
+106:noop
+107:noop
+108:noop
+109:noop
+110:noop
+111:noop
+112:noop
+113:noop
+92:exit
+97:exit
+113:exit
+109:exit
+105:exit
+107:exit
+86:exit
+88:exit
+94:exit
+91:exit
+103:exit
+89:exit
+110:exit
+93:exit
+101:exit
+96:exit
+98:exit
+112:exit
+85:name Food1
+87:name Food2
+90:name Food3
+95:name Food4
+99:name Food5
+100:name Food6
+102:name Food7
+104:name Food8
+22:name Food9
+106:name Food10
+108:name Food11
+111:name Food12
+111:who
+111:tell 1 testing...
+111:tell 2 testing...
+111:tell 3 testing...
+111:tell 4 testing...
+111:tell 5 testing...
+111:tell 6 testing...
+111:tell 7 testing...
+111:tell 8 testing...
+111:tell 9 testing...
+111:tell 10 testing...
+111:tell 11 testing...
+111:tell 12 testing...
+99:exit
+87:exit
+102:exit
+108:exit
+104:exit
+85:exit
+111:exit
+100:exit
+106:exit
+90:exit
+95:exit
+22:exit
+exit

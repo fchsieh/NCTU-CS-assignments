@@ -1,34 +1,30 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include <fstream>
+#include <iomanip>
+#include <iostream>
+using namespace std;
 
-int main(int argc,char **argv){
-         FILE *fp;
-         char c;
-         int inTag=0;
+int main(int argc, char* const argv[]) {
+  ifstream file;
+  if (argc == 2) {
+    file.open(argv[1]);
+    cin.rdbuf(file.rdbuf());
+  } else if (argc > 2) {
+    cerr << "usage: " << argv[0] << " [filename]" << endl;
+  }
 
-         if(argc == 1)
-                fp = stdin;
-         else if (argc == 2)
-                fp = fopen(argv[1],"r");
-         else{ 
-         	fprintf(stderr,"Usage:%s <file>\n",argv[1]);
-                exit(1);
-         }
-         while((c = fgetc(fp))!=EOF){
-                 if(c == '<'){
-                         inTag = 1;
-                         continue;
-                 }
-                 if(c == '>'){
-                         inTag = 0;
-                         continue;
-
-                 }
-                 if(!inTag)
-                         fputc(c, stdout);
-         }  
-//		 fputc('\n' , stdout) ;
-		 fflush(stdout);
-         fclose(fp);
-         return(0);
-}          
+  char c;
+  bool in_tag = false;
+  while (cin.get(c)) {
+    switch (c) {
+      case '<':
+        in_tag = true;
+        break;
+      case '>':
+        in_tag = false;
+        break;
+      default:
+        if (!in_tag) cout.put(c);
+    }
+  }
+  return 0;
+}

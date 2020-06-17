@@ -1,0 +1,145 @@
+1| ****************************************
+1| ** Welcome to the information server. **
+1| ****************************************
+1| *** User '(no name)' entered from [address1]. ***
+1| % noop
+2| ****************************************
+2| ** Welcome to the information server. **
+2| ****************************************
+2| *** User '(no name)' entered from [address2]. ***
+2| % noop
+3| ****************************************
+3| ** Welcome to the information server. **
+3| ****************************************
+3| *** User '(no name)' entered from [address3]. ***
+3| % noop
+4| ****************************************
+4| ** Welcome to the information server. **
+4| ****************************************
+4| *** User '(no name)' entered from [address4]. ***
+4| % noop
+1| % name Egglet
+2| % name FruitBuffet
+3| % name GingerCookies
+4| % name HotCakes
+1| *** User '(no name)' entered from [address2]. ***
+1| *** User '(no name)' entered from [address3]. ***
+1| *** User '(no name)' entered from [address4]. ***
+1| *** User from [address1] is named 'Egglet'. ***
+1| % number test.html >2
+1| *** User from [address2] is named 'FruitBuffet'. ***
+1| *** User from [address3] is named 'GingerCookies'. ***
+1| *** User from [address4] is named 'HotCakes'. ***
+1| *** Egglet (#1) just piped 'number test.html >2' to FruitBuffet (#2) ***
+1| % cat test.html >3
+1| *** Egglet (#1) just piped 'cat test.html >3' to GingerCookies (#3) ***
+1| % cat test.html | cat >3
+1| *** Error: the pipe #1->#3 already exists. ***
+1| % cat test.html >6
+2| *** User '(no name)' entered from [address3]. ***
+2| *** User '(no name)' entered from [address4]. ***
+2| *** User from [address1] is named 'Egglet'. ***
+2| *** User from [address2] is named 'FruitBuffet'. ***
+2| % number <1
+2| *** User from [address3] is named 'GingerCookies'. ***
+2| *** User from [address4] is named 'HotCakes'. ***
+2| *** Egglet (#1) just piped 'number test.html >2' to FruitBuffet (#2) ***
+2| *** Egglet (#1) just piped 'cat test.html >3' to GingerCookies (#3) ***
+2| *** FruitBuffet (#2) just received from Egglet (#1) by 'number <1' ***
+2|    1    1 <!test.html>
+2|    2    2 <TITLE>Test</TITLE>
+2|    3    3 <BODY>This is a <b>test</b> program
+2|    4    4 for ras.
+2|    5    5 </BODY>
+2| % cat test.html >3
+2| *** FruitBuffet (#2) just piped 'cat test.html >3' to GingerCookies (#3) ***
+2| % number <4
+3| *** User '(no name)' entered from [address4]. ***
+3| *** User from [address1] is named 'Egglet'. ***
+3| *** User from [address2] is named 'FruitBuffet'. ***
+3| *** User from [address3] is named 'GingerCookies'. ***
+3| % number <2
+3| *** User from [address4] is named 'HotCakes'. ***
+3| *** Egglet (#1) just piped 'number test.html >2' to FruitBuffet (#2) ***
+3| *** Egglet (#1) just piped 'cat test.html >3' to GingerCookies (#3) ***
+3| *** FruitBuffet (#2) just received from Egglet (#1) by 'number <1' ***
+3| *** FruitBuffet (#2) just piped 'cat test.html >3' to GingerCookies (#3) ***
+3| *** GingerCookies (#3) just received from FruitBuffet (#2) by 'number <2' ***
+3|    1 <!test.html>
+3|    2 <TITLE>Test</TITLE>
+3|    3 <BODY>This is a <b>test</b> program
+3|    4 for ras.
+3|    5 </BODY>
+3| % ls >4
+2| *** Error: the pipe #4->#2 does not exist yet. ***
+2| % number test.html >5
+3| *** GingerCookies (#3) just piped 'ls >4' to HotCakes (#4) ***
+3| % number <2
+4| *** User from [address1] is named 'Egglet'. ***
+4| *** User from [address2] is named 'FruitBuffet'. ***
+4| *** User from [address3] is named 'GingerCookies'. ***
+4| *** User from [address4] is named 'HotCakes'. ***
+4| % removetag test.html >1
+4| *** Egglet (#1) just piped 'number test.html >2' to FruitBuffet (#2) ***
+4| *** Egglet (#1) just piped 'cat test.html >3' to GingerCookies (#3) ***
+4| *** FruitBuffet (#2) just received from Egglet (#1) by 'number <1' ***
+4| *** FruitBuffet (#2) just piped 'cat test.html >3' to GingerCookies (#3) ***
+4| *** GingerCookies (#3) just received from FruitBuffet (#2) by 'number <2' ***
+4| *** GingerCookies (#3) just piped 'ls >4' to HotCakes (#4) ***
+4| *** HotCakes (#4) just piped 'removetag test.html >1' to Egglet (#1) ***
+4| % number <3
+4| *** HotCakes (#4) just received from GingerCookies (#3) by 'number <3' ***
+4|    1 baozi
+4|    2 bin
+4|    3 ls.txt
+4|    4 test.html
+4|    5 test1.txt
+4|    6 test2.txt
+4|    7 user_pipe
+4| % cat <3
+3| *** Error: the pipe #2->#3 does not exist yet. ***
+3| % cat <1
+1| *** Error: user #6 does not exist yet. ***
+1| % number <5
+1| *** FruitBuffet (#2) just received from Egglet (#1) by 'number <1' ***
+1| *** FruitBuffet (#2) just piped 'cat test.html >3' to GingerCookies (#3) ***
+1| *** GingerCookies (#3) just received from FruitBuffet (#2) by 'number <2' ***
+1| *** GingerCookies (#3) just piped 'ls >4' to HotCakes (#4) ***
+1| *** HotCakes (#4) just piped 'removetag test.html >1' to Egglet (#1) ***
+1| *** HotCakes (#4) just received from GingerCookies (#3) by 'number <3' ***
+1| *** GingerCookies (#3) just received from Egglet (#1) by 'cat <1' ***
+1| *** Error: user #5 does not exist yet. ***
+1| % exit
+5| ****************************************
+5| ** Welcome to the information server. **
+5| ****************************************
+5| *** User '(no name)' entered from [address5]. ***
+5| % noop
+5| % name IceCream
+5| *** User from [address5] is named 'IceCream'. ***
+5| % who
+5| <ID>	<nickname>	<IP:port>	<indicate me>
+5| 1	IceCream	[address5]	<-me
+5| 2	FruitBuffet	[address2]
+5| 3	GingerCookies	[address3]
+5| 4	HotCakes	[address4]
+5| % cat <4
+5| *** Error: the pipe #4->#1 does not exist yet. ***
+5| % number test.html >3
+2| *** GingerCookies (#3) just received from FruitBuffet (#2) by 'number <2' ***
+2| *** GingerCookies (#3) just piped 'ls >4' to HotCakes (#4) ***
+2| *** Error: user #5 does not exist yet. ***
+2| % exit
+3| *** HotCakes (#4) just piped 'removetag test.html >1' to Egglet (#1) ***
+3| *** HotCakes (#4) just received from GingerCookies (#3) by 'number <3' ***
+3| *** GingerCookies (#3) just received from Egglet (#1) by 'cat <1' ***
+3| <!test.html>
+3| <TITLE>Test</TITLE>
+3| <BODY>This is a <b>test</b> program
+3| for ras.
+3| </BODY>
+3| % exit
+4| *** Error: the pipe #3->#4 does not exist yet. ***
+4| % exit
+5| *** IceCream (#1) just piped 'number test.html >3' to GingerCookies (#3) ***
+5| % exit
