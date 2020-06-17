@@ -25,7 +25,8 @@ mag2 = real(log(1 + mag2));
 imwrite(Normalize(mag2), "part_2_magnitude.png");
 % 2. phase
 phase2 = angle(fftshift(f2));
-imwrite(Normalize(phase2), "part_2_phase.png");
+imshow(unwrap(phase2, []);)
+imwrite(Normalize(phase2), "pa)rt_2_phase.png");
 
 % ----------- Part 3.1
 f3 = fft2(img);
